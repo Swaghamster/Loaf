@@ -144,27 +144,24 @@ void UIManager::render() {
 
     EPDDisplay& epd = EPDDisplay::instance();
 
-    // Begin a full-screen page loop so all drawing goes into the frame buffer.
-    epd.raw().setFullWindow();
-    epd.raw().firstPage();
-    do {
-        epd.raw().fillScreen(GxEPD_WHITE);
+    // Clear the framebuffer to white, then draw the current screen.
+    epd.clear();
 
-        // Every screen gets the status bar at the top.
-        drawStatusBar();
+    // Every screen gets the status bar at the top.
+    drawStatusBar();
 
-        switch (_current) {
-            case Screen::SCREEN_HOME:     renderHome();     break;
-            case Screen::SCREEN_LIBRARY:  renderLibrary();  break;
-            case Screen::SCREEN_READER:   renderReader();   break;
-            case Screen::SCREEN_STATS:    renderStats();    break;
-            case Screen::SCREEN_SETTINGS: renderSettings(); break;
-            case Screen::SCREEN_NOTES:    renderNotes();    break;
-            case Screen::SCREEN_DICT:     renderDict();     break;
-            default: break;
-        }
+    switch (_current) {
+        case Screen::SCREEN_HOME:     renderHome();     break;
+        case Screen::SCREEN_LIBRARY:  renderLibrary();  break;
+        case Screen::SCREEN_READER:   renderReader();   break;
+        case Screen::SCREEN_STATS:    renderStats();    break;
+        case Screen::SCREEN_SETTINGS: renderSettings(); break;
+        case Screen::SCREEN_NOTES:    renderNotes();    break;
+        case Screen::SCREEN_DICT:     renderDict();     break;
+        default: break;
+    }
 
-    } while (epd.raw().nextPage());
+    epd.update();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -177,16 +174,16 @@ void UIManager::drawStatusBar() {
     EPDDisplay& epd = EPDDisplay::instance();
 
     // Background stripe — draw a thin rule along the bottom edge of the bar
-    epd.drawLine(0, STATUS_H - 1, EPD_WIDTH - 1, STATUS_H - 1, GxEPD_BLACK);
+    epd.drawLine(0, STATUS_H - 1, EPD_WIDTH - 1, STATUS_H - 1, 0x0000);
 
     // Battery icon placeholder: small rectangle with a nub
     const int16_t bx = 4, by = 4;
     const int16_t bw = 18, bh = STATUS_H - 8;
-    epd.drawRect(bx, by, bw, bh, GxEPD_BLACK);
+    epd.drawRect(bx, by, bw, bh, 0x0000);
     // Nub on right
-    epd.fillRect(bx + bw, by + (bh / 2) - 2, 3, 4, GxEPD_BLACK);
+    epd.fillRect(bx + bw, by + (bh / 2) - 2, 3, 4, 0x0000);
     // Simple fill to indicate ~75% charge (placeholder)
-    epd.fillRect(bx + 2, by + 2, (int16_t)((bw - 4) * 3 / 4), bh - 4, GxEPD_BLACK);
+    epd.fillRect(bx + 2, by + 2, (int16_t)((bw - 4) * 3 / 4), bh - 4, 0x0000);
 
     // Note count
     char noteBuf[24];
@@ -200,7 +197,7 @@ void UIManager::drawStatusBar() {
         }
     }
     snprintf(noteBuf, sizeof(noteBuf), "%d notes", noteCount);
-    epd.drawText(34, STATUS_H - 5, noteBuf, 12, false, GxEPD_BLACK);
+    epd.drawText(34, STATUS_H - 5, noteBuf, 12, false, 0x0000);
 
     // Elapsed time from millis() (HH:MM:SS format, 0-based from boot)
     uint32_t totalSec = millis() / 1000UL;
@@ -215,7 +212,7 @@ void UIManager::drawStatusBar() {
     }
     // Right-align time — measure width first
     int16_t timeW = epd.getTextWidth(timeBuf, 12, false);
-    epd.drawText(EPD_WIDTH - timeW - 4, STATUS_H - 5, timeBuf, 12, false, GxEPD_BLACK);
+    epd.drawText(EPD_WIDTH - timeW - 4, STATUS_H - 5, timeBuf, 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -237,13 +234,13 @@ void UIManager::drawMenuIcon(int16_t cx, int16_t cy,
 
     if (selected) {
         // Filled black box for selected state
-        epd.fillRect(x, y, ICON_SIZE, ICON_SIZE, GxEPD_BLACK);
+        epd.fillRect(x, y, ICON_SIZE, ICON_SIZE, 0x0000);
     } else {
-        epd.fillRect(x, y, ICON_SIZE, ICON_SIZE, GxEPD_WHITE);
-        epd.drawRect(x, y, ICON_SIZE, ICON_SIZE, GxEPD_BLACK);
+        epd.fillRect(x, y, ICON_SIZE, ICON_SIZE, 0xFFFF);
+        epd.drawRect(x, y, ICON_SIZE, ICON_SIZE, 0x0000);
     }
 
-    uint16_t fgColor = selected ? GxEPD_WHITE : GxEPD_BLACK;
+    uint16_t fgColor = selected ? 0xFFFF : 0x0000;
 
     // Draw a simple distinguishing symbol inside the box based on iconIndex
     switch (iconIndex) {
@@ -288,8 +285,7 @@ void UIManager::drawMenuIcon(int16_t cx, int16_t cy,
     int16_t labelW = epd.getTextWidth(label, 12, false);
     int16_t labelX = cx - labelW / 2;
     int16_t labelY = y + ICON_SIZE + 14;   // baseline below the box
-    epd.drawText(labelX, labelY, label, 12, false,
-                 selected ? GxEPD_BLACK : GxEPD_BLACK);
+    epd.drawText(labelX, labelY, label, 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -302,7 +298,7 @@ void UIManager::renderHome() {
     EPDDisplay& epd = EPDDisplay::instance();
 
     // Title
-    epd.drawText(4, CONTENT_Y + 16, "Loaf", 20, true, GxEPD_BLACK);
+    epd.drawText(4, CONTENT_Y + 16, "Loaf", 20, true, 0x0000);
 
     // Compute layout:
     // Total icon strip width = MENU_ITEM_COUNT * ICON_SIZE + (MENU_ITEM_COUNT-1) * ICON_GAP
@@ -321,7 +317,7 @@ void UIManager::renderHome() {
     // Navigation hint at bottom
     const char* hint = "UP/DOWN select  SELECT enter";
     int16_t hintW = epd.getTextWidth(hint, 12, false);
-    epd.drawText((EPD_WIDTH - hintW) / 2, EPD_HEIGHT - 5, hint, 12, false, GxEPD_BLACK);
+    epd.drawText((EPD_WIDTH - hintW) / 2, EPD_HEIGHT - 5, hint, 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -330,9 +326,9 @@ void UIManager::renderHome() {
 void UIManager::renderLibrary() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Library", 20, true, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Library", 20, true, 0x0000);
     epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, GxEPD_BLACK);
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
 
     std::vector<String> books;
     bool ok = FileManager::instance().isReady() &&
@@ -340,23 +336,23 @@ void UIManager::renderLibrary() {
 
     if (!ok || books.empty()) {
         epd.drawText(MARGIN_X, CONTENT_Y + 50,
-                     "No books found.", 16, false, GxEPD_BLACK);
+                     "No books found.", 16, false, 0x0000);
         epd.drawText(MARGIN_X, CONTENT_Y + 72,
-                     "Extract EPUBs to /books/<title>/", 12, false, GxEPD_BLACK);
+                     "Extract EPUBs to /books/<title>/", 12, false, 0x0000);
     } else {
         const int16_t lineH = epd.getLineHeight(16);
         int16_t       iy    = CONTENT_Y + 28 + lineH;
         for (const String& b : books) {
             if (iy + lineH > EPD_HEIGHT - 10) {
-                epd.drawText(MARGIN_X, iy, "...", 12, false, GxEPD_BLACK);
+                epd.drawText(MARGIN_X, iy, "...", 12, false, 0x0000);
                 break;
             }
-            epd.drawText(MARGIN_X, iy, b.c_str(), 16, false, GxEPD_BLACK);
+            epd.drawText(MARGIN_X, iy, b.c_str(), 16, false, 0x0000);
             iy += lineH + 2;
         }
     }
 
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -366,10 +362,10 @@ void UIManager::renderLibrary() {
 void UIManager::renderReader() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Reader", 16, true, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Reader", 16, true, 0x0000);
     epd.drawText(MARGIN_X, CONTENT_Y + 40,
-                 "No book open. Go to Library.", 16, false, GxEPD_BLACK);
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, GxEPD_BLACK);
+                 "No book open. Go to Library.", 16, false, 0x0000);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -378,9 +374,9 @@ void UIManager::renderReader() {
 void UIManager::renderStats() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Reading Stats", 20, true, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Reading Stats", 20, true, 0x0000);
     epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, GxEPD_BLACK);
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
 
     // Session timer from millis — simple uptime display without RTC
     uint32_t totalSec = millis() / 1000UL;
@@ -388,12 +384,12 @@ void UIManager::renderStats() {
     uint32_t mm = (totalSec % 3600UL) / 60UL;
     char buf[64];
     snprintf(buf, sizeof(buf), "Session time: %uh %02um", (unsigned)hh, (unsigned)mm);
-    epd.drawText(MARGIN_X, CONTENT_Y + 46, buf, 16, false, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 46, buf, 16, false, 0x0000);
 
     epd.drawText(MARGIN_X, CONTENT_Y + 70,
-                 "Full stats: see Stats module.", 12, false, GxEPD_BLACK);
+                 "Full stats: see Stats module.", 12, false, 0x0000);
 
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -402,9 +398,9 @@ void UIManager::renderStats() {
 void UIManager::renderSettings() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Settings", 20, true, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Settings", 20, true, 0x0000);
     epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, GxEPD_BLACK);
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
 
     const char* lines[] = {
         "Font Size:     Normal",
@@ -416,11 +412,11 @@ void UIManager::renderSettings() {
     const int16_t lineH = epd.getLineHeight(16);
     int16_t iy = CONTENT_Y + 28 + lineH;
     for (const char* l : lines) {
-        epd.drawText(MARGIN_X, iy, l, 16, false, GxEPD_BLACK);
+        epd.drawText(MARGIN_X, iy, l, 16, false, 0x0000);
         iy += lineH + 2;
     }
 
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -429,9 +425,9 @@ void UIManager::renderSettings() {
 void UIManager::renderNotes() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Notes", 20, true, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Notes", 20, true, 0x0000);
     epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, GxEPD_BLACK);
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
 
     std::vector<String> noteFiles;
     bool ok = FileManager::instance().isReady() &&
@@ -439,21 +435,21 @@ void UIManager::renderNotes() {
 
     if (!ok || noteFiles.empty()) {
         epd.drawText(MARGIN_X, CONTENT_Y + 50,
-                     "No notes yet.", 16, false, GxEPD_BLACK);
+                     "No notes yet.", 16, false, 0x0000);
     } else {
         const int16_t lineH = epd.getLineHeight(16);
         int16_t       iy    = CONTENT_Y + 28 + lineH;
         for (const String& nf : noteFiles) {
             if (iy + lineH > EPD_HEIGHT - 20) {
-                epd.drawText(MARGIN_X, iy, "...", 12, false, GxEPD_BLACK);
+                epd.drawText(MARGIN_X, iy, "...", 12, false, 0x0000);
                 break;
             }
-            epd.drawText(MARGIN_X, iy, nf.c_str(), 16, false, GxEPD_BLACK);
+            epd.drawText(MARGIN_X, iy, nf.c_str(), 16, false, 0x0000);
             iy += lineH + 2;
         }
     }
 
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -462,14 +458,14 @@ void UIManager::renderNotes() {
 void UIManager::renderDict() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Dictionary", 20, true, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Dictionary", 20, true, 0x0000);
     epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, GxEPD_BLACK);
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
 
     epd.drawText(MARGIN_X, CONTENT_Y + 50,
-                 "Look up: (no keyboard input yet)", 16, false, GxEPD_BLACK);
+                 "Look up: (no keyboard input yet)", 16, false, 0x0000);
     epd.drawText(MARGIN_X, CONTENT_Y + 74,
-                 "Connect BLE keyboard to search.", 12, false, GxEPD_BLACK);
+                 "Connect BLE keyboard to search.", 12, false, 0x0000);
 
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, GxEPD_BLACK);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }

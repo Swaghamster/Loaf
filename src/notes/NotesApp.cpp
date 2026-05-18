@@ -10,7 +10,6 @@
 #include "../ui/UIManager.h"
 #include "../../include/config.h"
 
-#include <GxEPD2_BW.h>
 
 // ── Singleton ──────────────────────────────────────────────────
 NotesApp& NotesApp::instance() {
@@ -44,11 +43,10 @@ void NotesApp::render() {
     }
 
     // ── White canvas ──────────────────────────────────────────
-    auto& raw = epd.raw();
-    raw.setFullWindow();
-    raw.firstPage();
+    auto& raw = epd.canvas();
+    epd.clear();
     do {
-        raw.fillScreen(GxEPD_WHITE);
+        
 
         _drawHeader();
 
@@ -75,13 +73,13 @@ void NotesApp::render() {
         // ── Footer hint bar ───────────────────────────────────
         {
             int16_t fy = EPD_HEIGHT - FOOTER_H;
-            raw.drawFastHLine(0, fy, EPD_WIDTH, GxEPD_BLACK);
+            epd.canvas().drawFastHLine(0, fy, EPD_WIDTH, 0x0000);
             epd.drawText(ROW_MARGIN_X, fy + 14,
                          "UP/DN: scroll  SEL: open  MENU: new  SEL long: delete",
-                         12, false, GxEPD_BLACK);
+                         12, false, 0x0000);
         }
 
-    } while (raw.nextPage());
+    epd.update();
 
     epd.update();
 }
@@ -220,34 +218,34 @@ void NotesApp::refreshList() {
 
 void NotesApp::_drawHeader() {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.raw();
+    auto& raw = epd.canvas();
 
     // Filled header bar
-    raw.fillRect(0, 0, EPD_WIDTH, HEADER_H, GxEPD_BLACK);
-    epd.drawText(ROW_MARGIN_X, HEADER_H - 7, "Notes", 16, true, GxEPD_WHITE);
+    epd.canvas().fillRect(0, 0, EPD_WIDTH, HEADER_H, 0x0000);
+    epd.drawText(ROW_MARGIN_X, HEADER_H - 7, "Notes", 16, true, 0xFFFF);
 
     // Note count on right
     String countStr = String(_notes.size()) + " note" +
                       (_notes.size() != 1 ? "s" : "");
     int16_t cw = epd.getTextWidth(countStr.c_str(), 12, false);
     epd.drawText(EPD_WIDTH - cw - ROW_MARGIN_X, HEADER_H - 6,
-                 countStr.c_str(), 12, false, GxEPD_WHITE);
+                 countStr.c_str(), 12, false, 0xFFFF);
 }
 
 void NotesApp::_drawNoteRow(int16_t y, const NoteEntry& entry, bool selected) {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.raw();
+    auto& raw = epd.canvas();
 
     // Selection highlight
     if (selected) {
-        raw.fillRect(0, y, EPD_WIDTH, ROW_H - 1, GxEPD_BLACK);
+        epd.canvas().fillRect(0, y, EPD_WIDTH, ROW_H - 1, 0x0000);
     }
 
-    uint16_t textColor = selected ? GxEPD_WHITE : GxEPD_BLACK;
+    uint16_t textColor = selected ? 0xFFFF : 0x0000;
 
     // Divider line at bottom of row (skip for selected — already a filled block)
     if (!selected) {
-        raw.drawFastHLine(0, y + ROW_H - 1, EPD_WIDTH, GxEPD_BLACK);
+        epd.canvas().drawFastHLine(0, y + ROW_H - 1, EPD_WIDTH, 0x0000);
     }
 
     // Title (bold, 16pt)
@@ -279,59 +277,58 @@ void NotesApp::_drawEmpty() {
     int16_t cx = EPD_WIDTH / 2;
     int16_t cy = EPD_HEIGHT / 2;
 
-    epd.drawText(cx - 60, cy - 10, "No notes yet.", 16, false, GxEPD_BLACK);
+    epd.drawText(cx - 60, cy - 10, "No notes yet.", 16, false, 0x0000);
     epd.drawText(cx - 90, cy + 14,
-                 "Press MENU to create your first note.", 12, false, GxEPD_BLACK);
+                 "Press MENU to create your first note.", 12, false, 0x0000);
 }
 
 void NotesApp::_drawDeleteDialog(const String& title) {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.raw();
+    auto& raw = epd.canvas();
 
-    raw.setFullWindow();
-    raw.firstPage();
+    epd.clear();
     do {
-        raw.fillScreen(GxEPD_WHITE);
+        
 
         // Dialog box
         int16_t dx = 40, dy = 80, dw = EPD_WIDTH - 80, dh = 140;
-        raw.fillRect(dx, dy, dw, dh, GxEPD_WHITE);
-        raw.drawRect(dx, dy, dw, dh, GxEPD_BLACK);
-        raw.drawRect(dx + 1, dy + 1, dw - 2, dh - 2, GxEPD_BLACK);
+        epd.canvas().fillRect(dx, dy, dw, dh, 0xFFFF);
+        epd.canvas().drawRect(dx, dy, dw, dh, 0x0000);
+        epd.canvas().drawRect(dx + 1, dy + 1, dw - 2, dh - 2, 0x0000);
 
         // Title
-        epd.drawText(dx + 12, dy + 22, "Delete note?", 16, true, GxEPD_BLACK);
+        epd.drawText(dx + 12, dy + 22, "Delete note?", 16, true, 0x0000);
 
         // Note title
         String truncTitle = title.length() > 30 ? title.substring(0, 30) + "..." : title;
-        epd.drawText(dx + 12, dy + 44, truncTitle.c_str(), 12, false, GxEPD_BLACK);
+        epd.drawText(dx + 12, dy + 44, truncTitle.c_str(), 12, false, 0x0000);
 
         // Divider
-        raw.drawFastHLine(dx, dy + 54, dw, GxEPD_BLACK);
+        epd.canvas().drawFastHLine(dx, dy + 54, dw, 0x0000);
 
         // YES button
         {
-            uint16_t btnBg  = _deleteYes ? GxEPD_BLACK : GxEPD_WHITE;
-            uint16_t btnTxt = _deleteYes ? GxEPD_WHITE : GxEPD_BLACK;
-            raw.fillRect(dx + 20, dy + 70, 80, 36, btnBg);
-            raw.drawRect(dx + 20, dy + 70, 80, 36, GxEPD_BLACK);
+            uint16_t btnBg  = _deleteYes ? 0x0000 : 0xFFFF;
+            uint16_t btnTxt = _deleteYes ? 0xFFFF : 0x0000;
+            epd.canvas().fillRect(dx + 20, dy + 70, 80, 36, btnBg);
+            epd.canvas().drawRect(dx + 20, dy + 70, 80, 36, 0x0000);
             epd.drawText(dx + 38, dy + 94, "YES", 16, true, btnTxt);
         }
 
         // NO button
         {
-            uint16_t btnBg  = !_deleteYes ? GxEPD_BLACK : GxEPD_WHITE;
-            uint16_t btnTxt = !_deleteYes ? GxEPD_WHITE : GxEPD_BLACK;
-            raw.fillRect(dx + 120, dy + 70, 80, 36, btnBg);
-            raw.drawRect(dx + 120, dy + 70, 80, 36, GxEPD_BLACK);
+            uint16_t btnBg  = !_deleteYes ? 0x0000 : 0xFFFF;
+            uint16_t btnTxt = !_deleteYes ? 0xFFFF : 0x0000;
+            epd.canvas().fillRect(dx + 120, dy + 70, 80, 36, btnBg);
+            epd.canvas().drawRect(dx + 120, dy + 70, 80, 36, 0x0000);
             epd.drawText(dx + 141, dy + 94, "NO", 16, true, btnTxt);
         }
 
         // Hint
         epd.drawText(dx + 12, dy + 124,
                      "UP/DN: choose  SEL: confirm  BACK: cancel",
-                     12, false, GxEPD_BLACK);
-    } while (raw.nextPage());
+                     12, false, 0x0000);
+    epd.update();
 }
 
 // ── Private: static helpers ────────────────────────────────────

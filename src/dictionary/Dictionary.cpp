@@ -140,9 +140,9 @@ void Dictionary::renderLookup(const String& word) {
     const int16_t INNER = 8;   // inner padding from panel edge to text
 
     // White panel with black border (2 px)
-    epd.fillRect(PX, PY, PW, PH, GxEPD_WHITE);
-    epd.drawRect(PX,     PY,     PW,     PH,     GxEPD_BLACK);
-    epd.drawRect(PX + 1, PY + 1, PW - 2, PH - 2, GxEPD_BLACK);
+    epd.fillRect(PX, PY, PW, PH, 0xFFFF);
+    epd.drawRect(PX,     PY,     PW,     PH,     0x0000);
+    epd.drawRect(PX + 1, PY + 1, PW - 2, PH - 2, 0x0000);
 
     // ── Word heading ─────────────────────────────────────────
     int16_t textX = PX + INNER;
@@ -155,7 +155,7 @@ void Dictionary::renderLookup(const String& word) {
     textY += 4;  // small gap after heading
 
     // Thin divider under the word
-    epd.drawLine(textX, textY, PX + PW - INNER, textY, GxEPD_BLACK);
+    epd.drawLine(textX, textY, PX + PW - INNER, textY, 0x0000);
     textY += 8;
 
     // ── Definition area ──────────────────────────────────────
@@ -200,7 +200,7 @@ void Dictionary::renderLookup(const String& word) {
                 if (etymY > defY + 10) {
                     // Subtle separator
                     epd.drawLine(defX, etymY - 4,
-                                 PX + PW - INNER, etymY - 4, GxEPD_BLACK);
+                                 PX + PW - INNER, etymY - 4, 0x0000);
                     epd.drawText(defX, etymY,
                                  etym.c_str(), FONT_SMALL, /*bold=*/false);
                 }

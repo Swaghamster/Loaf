@@ -264,7 +264,8 @@ int TextRenderer::paginate(const String& text, std::vector<Page>& pages) {
 // ─────────────────────────────────────────────────────────────────────────────
 // renderPage
 //
-// Draws all RenderLines in the page onto EPDDisplay.
+// Clears the framebuffer to white, draws all RenderLines in the page, then
+// flushes to the physical display.
 //
 // For each RenderLine:
 //   - If boldPart is non-empty:
@@ -272,20 +273,17 @@ int TextRenderer::paginate(const String& text, std::vector<Page>& pages) {
 //       draw normalPart immediately to the right
 //   - Otherwise:
 //       draw normalPart at (rl.x, rl.y)
-//
-// The caller must have set up the GxEPD2 page loop beforehand
-// (firstPage / nextPage) if doing a full refresh.  This function
-// just calls EPDDisplay drawing primitives which work correctly
-// both inside and outside a page loop.
 // ─────────────────────────────────────────────────────────────────────────────
 void TextRenderer::renderPage(const Page& page) {
     EPDDisplay& epd = EPDDisplay::instance();
+
+    epd.clear();
 
     for (const RenderLine& rl : page.lines) {
         if (rl.boldPart.length() > 0) {
             // Draw bold prefix
             epd.drawText(rl.x, rl.y, rl.boldPart.c_str(),
-                         _cfg.fontSize, /*bold=*/true, GxEPD_BLACK);
+                         _cfg.fontSize, /*bold=*/true, 0x0000);
 
             // Measure bold prefix width to position suffix correctly
             int16_t bw = epd.getTextWidth(rl.boldPart.c_str(),
@@ -294,14 +292,16 @@ void TextRenderer::renderPage(const Page& page) {
             // Draw normal suffix immediately to the right
             if (rl.normalPart.length() > 0) {
                 epd.drawText(rl.x + bw, rl.y, rl.normalPart.c_str(),
-                             _cfg.fontSize, /*bold=*/false, GxEPD_BLACK);
+                             _cfg.fontSize, /*bold=*/false, 0x0000);
             }
         } else {
             // No bionic splitting — just draw the whole word normally
             if (rl.normalPart.length() > 0) {
                 epd.drawText(rl.x, rl.y, rl.normalPart.c_str(),
-                             _cfg.fontSize, /*bold=*/false, GxEPD_BLACK);
+                             _cfg.fontSize, /*bold=*/false, 0x0000);
             }
         }
     }
+
+    epd.update();
 }

@@ -20,9 +20,7 @@
 #include <ArduinoJson.h>
 #include <vector>
 
-// Forward declarations for display types used in renderStatsScreen.
-// Actual GxEPD2 / Adafruit-GFX headers are included only in the .cpp.
-class GxEPD2_BW_R;   // not used directly here — kept for documentation
+// EPDDisplay is included only in the .cpp to keep this header lightweight.
 
 // ---------------------------------------------------------
 // Data structures

@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Arduino.h>
-#include <SdFat.h>
 #include <vector>
 
 // ============================================================
 // FileManager
-// Thin wrapper around SdFat (SdFs variant) that provides the
-// file-system operations needed by the Loaf app layer.
+// Thin wrapper around SDCardManager (community SDK singleton)
+// that provides the file-system operations needed by the Loaf
+// app layer.
 //
 // Usage:
 //   if (!FileManager::instance().init()) { /* handle error */ }
@@ -32,9 +32,8 @@ public:
     // Lifecycle
     // ---------------------------------------------------------
 
-    /// Initialise the SD card and mount the filesystem.
-    /// Must be called once (typically from setup()) before any
-    /// other method.  Returns true on success.
+    /// Initialise the SD card via SDCardManager and create
+    /// required application directories.  Returns true on success.
     bool init();
 
     /// Returns true if the SD card was successfully initialised.
@@ -59,7 +58,6 @@ public:
     bool readFile(const char* path, String& out);
 
     /// Overwrite path with content (creates the file if needed).
-    /// Creates intermediate directories automatically.
     /// Returns false on failure.
     bool writeFile(const char* path, const String& content);
 
@@ -86,8 +84,8 @@ public:
     /// List the immediate children of dir into names.
     /// If ext is non-null (e.g. ".txt"), only entries whose names
     /// end with that extension (case-insensitive) are included.
-    /// Directories are excluded; only plain files are listed.
-    /// Returns false if dir cannot be opened.
+    /// Directories and hidden files are excluded.
+    /// Returns false if dir cannot be listed.
     bool listDir(const char* dir,
                  std::vector<String>& names,
                  const char* ext = nullptr);
@@ -95,16 +93,8 @@ public:
 private:
     FileManager() = default;
 
-    // Ensure all parent directories of path exist.
-    bool _ensureParentDirs(const char* path);
-
     // Case-insensitive suffix check helper.
     static bool _hasSuffix(const char* name, const char* suffix);
 
-    SdFs  _sd;
-    bool  _ready = false;
-
-    // Scratch buffer for building paths — avoids repeated stack allocation.
-    static constexpr size_t _PATH_BUF = 256;
-    char _pathBuf[_PATH_BUF];
+    bool _ready = false;
 };

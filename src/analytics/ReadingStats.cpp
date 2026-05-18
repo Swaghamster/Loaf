@@ -282,12 +282,11 @@ String ReadingStats::todayString() {
 void ReadingStats::renderStatsScreen() {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    // White background
-    epd.fillRect(0, 0, EPD_WIDTH, EPD_HEIGHT, GxEPD_WHITE);
+    epd.clear();  // fill framebuffer white
 
     // ── Title bar ─────────────────────────────────────────────
-    epd.fillRect(0, 0, EPD_WIDTH, 24, GxEPD_BLACK);
-    epd.drawText(8, 17, "Reading Stats", FONT_NORMAL, /*bold=*/true, GxEPD_WHITE);
+    epd.fillRect(0, 0, EPD_WIDTH, 24, 0x0000);
+    epd.drawText(8, 17, "Reading Stats", FONT_NORMAL, /*bold=*/true, 0xFFFF);
 
     int16_t y = 34;
 
@@ -324,16 +323,16 @@ void ReadingStats::renderStatsScreen() {
     y += 16;
 
     // Outline
-    epd.drawRect(BAR_X, y, BAR_W, BAR_H, GxEPD_BLACK);
+    epd.drawRect(BAR_X, y, BAR_W, BAR_H, 0x0000);
     // Fill
     int16_t fillW = static_cast<int16_t>(BAR_W * progress);
     if (fillW > 0) {
-        epd.fillRect(BAR_X, y, fillW, BAR_H, GxEPD_BLACK);
+        epd.fillRect(BAR_X, y, fillW, BAR_H, 0x0000);
     }
     y += BAR_H + 8;
 
     // ── Divider ───────────────────────────────────────────────
-    epd.drawLine(8, y, EPD_WIDTH - 8, y, GxEPD_BLACK);
+    epd.drawLine(8, y, EPD_WIDTH - 8, y, 0x0000);
     y += 6;
 
     // ── Top 3 books ───────────────────────────────────────────

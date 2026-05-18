@@ -124,12 +124,11 @@ private:
     void _renderTextArea();
 
     /// Draw just the soft-keyboard grid (bottom KEYBOARD_H pixels).
-    /// doPartialFlush=true: owns its own firstPage/nextPage + partial window commit.
-    /// doPartialFlush=false: draws into an already-open firstPage/nextPage loop.
+    /// doPartialFlush=true: draws to canvas then calls updatePartial for that region.
+    /// doPartialFlush=false: draws to canvas only (caller does the flush).
     void _renderSoftKeyboard(bool doPartialFlush = true);
 
     /// Low-level drawing primitive used by _renderSoftKeyboard().
-    /// Must be called inside a firstPage/nextPage loop.
     void _drawSoftKeyboardContent(EPDDisplay& epd);
 
     /// Draw the editor-menu overlay.

@@ -11,7 +11,7 @@
 // Owns all font registrations for Loaf.  EPDDisplay calls FontManager to
 // resolve a (FontID, size, bold) triple into a GFXfont pointer.
 //
-// Built-in fonts (always available — shipped with Adafruit GFX / GxEPD2):
+// Built-in fonts (always available — shipped with Adafruit GFX Library):
 //   FONT_SANS   — FreeSans 9/12/18/24pt + bold variants
 //   FONT_SERIF  — FreeSerif 9/12/18/24pt
 //   FONT_MONO   — FreeMono 9/12/18/24pt
@@ -24,7 +24,7 @@
 // transparently falls back to the closest built-in equivalent.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Built-in GFX font headers (always present via GxEPD2 dependency)
+// Built-in GFX font headers (always present via Adafruit GFX dependency)
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
 #include <Fonts/FreeSans18pt7b.h>
