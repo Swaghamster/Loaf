@@ -2,6 +2,7 @@
 #include "../display/EPDDisplay.h"
 #include "../storage/FileManager.h"
 #include "../reader/CoverLoader.h"
+#include "../terminal/TerminalApp.h"
 #include "../../include/config.h"
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ static const MenuItem kMenuItems[UIManager::MENU_ITEM_COUNT] = {
     { "Settings",   Screen::SCREEN_SETTINGS },
     { "Games",      Screen::SCREEN_GAMES    },
     { "Apps",       Screen::SCREEN_APPS     },
+    { "Terminal",   Screen::SCREEN_TERMINAL },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,16 +74,19 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
         case Screen::SCREEN_HOME:
             if (btn == BTN_DOWN) {
                 if (_homeZone == 0) {
-                    // Drop from book zone into menu list
                     _homeZone = 1; _dirty = true;
                 } else if (_menuIndex < MENU_ITEM_COUNT - 1) {
-                    ++_menuIndex; _dirty = true;
+                    ++_menuIndex;
+                    if (_menuIndex >= _menuScroll + MENU_VISIBLE_ROWS)
+                        ++_menuScroll;
+                    _dirty = true;
                 }
             } else if (btn == BTN_UP) {
                 if (_homeZone == 1 && _menuIndex > 0) {
-                    --_menuIndex; _dirty = true;
+                    --_menuIndex;
+                    if (_menuIndex < _menuScroll) --_menuScroll;
+                    _dirty = true;
                 } else if (_homeZone == 1) {
-                    // At the top of the list — jump back to book zone
                     _homeZone = 0; _dirty = true;
                 }
             } else if (btn == BTN_LEFT && _homeZone == 0 && _recentCount > 1) {
@@ -127,6 +132,16 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
         case Screen::SCREEN_SETTINGS:
         case Screen::SCREEN_NOTES:
         case Screen::SCREEN_DICT:
+        // ── Terminal — route all buttons to TerminalApp ───────────────────
+        case Screen::SCREEN_TERMINAL:
+            if (btn == BTN_BACK && !longPress) {
+                TerminalApp::instance().handleButton(btn, longPress);
+                back();
+            } else {
+                TerminalApp::instance().handleButton(btn, longPress);
+            }
+            break;
+
         case Screen::SCREEN_GAMES:
         case Screen::SCREEN_APPS:
             if (btn == BTN_BACK) {
@@ -145,9 +160,9 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
 // navigateTo
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::navigateTo(Screen s) {
-    if (_history.size() < 16) {      // guard against stack overflow
-        _history.push_back(_current);
-    }
+    if (_history.size() < 16) _history.push_back(_current);
+    if (s == Screen::SCREEN_TERMINAL)        TerminalApp::instance().activate();
+    else if (_current == Screen::SCREEN_TERMINAL) TerminalApp::instance().deactivate();
     _current = s;
     _dirty   = true;
 }
@@ -156,6 +171,7 @@ void UIManager::navigateTo(Screen s) {
 // back
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::back() {
+    if (_current == Screen::SCREEN_TERMINAL) TerminalApp::instance().deactivate();
     if (_history.empty()) {
         _current = Screen::SCREEN_HOME;
     } else {
@@ -190,6 +206,7 @@ void UIManager::render() {
         case Screen::SCREEN_DICT:     renderDict();     break;
         case Screen::SCREEN_GAMES:    renderGames();    break;
         case Screen::SCREEN_APPS:     renderApps();     break;
+        case Screen::SCREEN_TERMINAL: renderTerminal(); break;
         default: break;
     }
 
@@ -375,15 +392,15 @@ void UIManager::_drawMenuList() {
     const int16_t rowH = MENU_ROW_H;
     int16_t y = MENU_ZONE_TOP + 1;
 
-    for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
+    const int last = min(_menuScroll + MENU_VISIBLE_ROWS, MENU_ITEM_COUNT);
+    for (int i = _menuScroll; i < last; ++i) {
         const bool sel = (i == _menuIndex) && zact;
 
         if (sel) {
             epd.fillRect(0, y, EPD_WIDTH, rowH, 0x0000);
         } else {
             epd.fillRect(0, y, EPD_WIDTH, rowH, 0xFFFF);
-            // Row divider (skip on last row)
-            if (i < MENU_ITEM_COUNT - 1)
+            if (i < last - 1)
                 epd.drawLine(0, y + rowH - 1, EPD_WIDTH - 1, y + rowH - 1, 0x0000);
         }
 
@@ -399,6 +416,23 @@ void UIManager::_drawMenuList() {
 
         y += rowH;
     }
+
+    // Scroll arrows when list overflows
+    if (_menuScroll > 0) {
+        int16_t aw = epd.getTextWidth("^", 10, false);
+        epd.drawText(EPD_WIDTH - aw - 2, MENU_ZONE_TOP + 2, "^", 10, false, 0x0000);
+    }
+    if (_menuScroll + MENU_VISIBLE_ROWS < MENU_ITEM_COUNT) {
+        int16_t aw = epd.getTextWidth("v", 10, false);
+        epd.drawText(EPD_WIDTH - aw - 2, EPD_HEIGHT - 14, "v", 10, false, 0x0000);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// renderTerminal — delegates to TerminalApp
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::renderTerminal() {
+    TerminalApp::instance().render();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

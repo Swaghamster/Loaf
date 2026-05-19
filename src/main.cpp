@@ -13,6 +13,7 @@
 #include "display/EPDDisplay.h"
 #include "storage/FileManager.h"
 #include "ui/UIManager.h"
+#include "terminal/TerminalApp.h"
 
 // Community SDK — real hardware drivers
 #include <InputManager.h>
@@ -64,6 +65,10 @@ void setup() {
     Serial.println(F("[boot] UIManager init"));
     UIManager::instance().init();
 
+    // 6. Terminal app (BLE keyboard host must be init'd first if using BLE).
+    Serial.println(F("[boot] TerminalApp init"));
+    TerminalApp::instance().init();
+
     Serial.println(F("[boot] Ready"));
 }
 
@@ -114,6 +119,9 @@ void loop() {
             }
         }
     }
+
+    // ── Terminal SSH pump ─────────────────────────────────────────────────────
+    TerminalApp::instance().tick();
 
     // ── Auto-sleep ────────────────────────────────────────────────────────────
     if (POWER_AUTO_SLEEP_MS > 0 &&

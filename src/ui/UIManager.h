@@ -14,6 +14,7 @@ enum class Screen : uint8_t {
     SCREEN_DICT,
     SCREEN_GAMES,
     SCREEN_APPS,
+    SCREEN_TERMINAL,
 };
 
 // ── Button indices — must match InputManager constants exactly ────────────
@@ -41,7 +42,8 @@ public:
     Screen currentScreen() const { return _current; }
     int    selectedMenuItem() const { return _menuIndex; }
 
-    static constexpr int MENU_ITEM_COUNT  = 7;   // Library Notes Stats Dict Settings Games Apps
+    static constexpr int MENU_ITEM_COUNT   = 8;   // Library Notes Stats Dict Settings Games Apps Terminal
+    static constexpr int MENU_VISIBLE_ROWS = 7;   // rows shown at once; list scrolls when count > 7
     static constexpr int RECENT_BOOKS_MAX = 10;
 
     void recordRecentBook(const String& title, const String& filename,
@@ -60,6 +62,7 @@ private:
     void renderDict();
     void renderGames();
     void renderApps();
+    void renderTerminal();
 
     // ── Home helpers ──────────────────────────────────────────────────────
     // Top zone: Cover Flow–style book carousel
@@ -76,9 +79,10 @@ private:
     Screen _current   = Screen::SCREEN_HOME;
     std::vector<Screen> _history;
     bool   _dirty     = true;
-    int    _menuIndex = 0;   // selected row in iPod menu (0 – MENU_ITEM_COUNT-1)
-    int    _homeZone  = 0;   // 0=book carousel, 1=menu list
-    int    _bookIndex = 0;   // selected book in carousel
+    int    _menuIndex  = 0;   // selected row in iPod menu (0 – MENU_ITEM_COUNT-1)
+    int    _menuScroll = 0;   // first visible row index (for scrolling)
+    int    _homeZone   = 0;   // 0=book carousel, 1=menu list
+    int    _bookIndex  = 0;   // selected book in carousel
 
     struct RecentBook {
         String title;
