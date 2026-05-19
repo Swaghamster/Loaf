@@ -25,11 +25,12 @@ struct MenuItem {
 };
 
 static const MenuItem kMenuItems[UIManager::MENU_ITEM_COUNT] = {
-    { "Library",  Screen::SCREEN_LIBRARY  },
-    { "Notes",    Screen::SCREEN_NOTES    },
-    { "Stats",    Screen::SCREEN_STATS    },
-    { "Dict",     Screen::SCREEN_DICT     },
-    { "Settings", Screen::SCREEN_SETTINGS },
+    { "Library",    Screen::SCREEN_LIBRARY  },
+    { "Notes",      Screen::SCREEN_NOTES    },
+    { "Stats",      Screen::SCREEN_STATS    },
+    { "Dictionary", Screen::SCREEN_DICT     },
+    { "Settings",   Screen::SCREEN_SETTINGS },
+    { "Games",      Screen::SCREEN_GAMES    },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -68,26 +69,26 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
 
         // ── Home screen — two-zone navigation ───────────────────────────────
         case Screen::SCREEN_HOME:
-            if (btn == BTN_UP && _homeZone != 0) {
-                _homeZone = 0; _dirty = true;
-            } else if (btn == BTN_DOWN && _homeZone != 1) {
-                _homeZone = 1; _dirty = true;
-            } else if (btn == BTN_LEFT) {
-                if (_homeZone == 0 && _recentCount > 1) {
-                    _bookIndex = (_bookIndex - 1 + _recentCount) % _recentCount;
-                    _dirty = true;
-                } else if (_homeZone == 1) {
-                    _menuIndex = (_menuIndex - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
-                    _dirty = true;
+            if (btn == BTN_DOWN) {
+                if (_homeZone == 0) {
+                    // Drop from book zone into menu list
+                    _homeZone = 1; _dirty = true;
+                } else if (_menuIndex < MENU_ITEM_COUNT - 1) {
+                    ++_menuIndex; _dirty = true;
                 }
-            } else if (btn == BTN_RIGHT) {
-                if (_homeZone == 0 && _recentCount > 1) {
-                    _bookIndex = (_bookIndex + 1) % _recentCount;
-                    _dirty = true;
+            } else if (btn == BTN_UP) {
+                if (_homeZone == 1 && _menuIndex > 0) {
+                    --_menuIndex; _dirty = true;
                 } else if (_homeZone == 1) {
-                    _menuIndex = (_menuIndex + 1) % MENU_ITEM_COUNT;
-                    _dirty = true;
+                    // At the top of the list — jump back to book zone
+                    _homeZone = 0; _dirty = true;
                 }
+            } else if (btn == BTN_LEFT && _homeZone == 0 && _recentCount > 1) {
+                _bookIndex = (_bookIndex - 1 + _recentCount) % _recentCount;
+                _dirty = true;
+            } else if (btn == BTN_RIGHT && _homeZone == 0 && _recentCount > 1) {
+                _bookIndex = (_bookIndex + 1) % _recentCount;
+                _dirty = true;
             } else if (btn == BTN_SELECT) {
                 if (_homeZone == 0) {
                     navigateTo(_recentCount > 0
@@ -120,11 +121,12 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
             }
             break;
 
-        // ── Stats / Settings / Notes / Dict ──────────────────────────────────
+        // ── Stats / Settings / Notes / Dict / Games ──────────────────────────
         case Screen::SCREEN_STATS:
         case Screen::SCREEN_SETTINGS:
         case Screen::SCREEN_NOTES:
         case Screen::SCREEN_DICT:
+        case Screen::SCREEN_GAMES:
             if (btn == BTN_BACK) {
                 back();
             } else if (btn == BTN_UP || btn == BTN_DOWN) {
@@ -184,6 +186,7 @@ void UIManager::render() {
         case Screen::SCREEN_SETTINGS: renderSettings(); break;
         case Screen::SCREEN_NOTES:    renderNotes();    break;
         case Screen::SCREEN_DICT:     renderDict();     break;
+        case Screen::SCREEN_GAMES:    renderGames();    break;
         default: break;
     }
 
@@ -353,91 +356,55 @@ void UIManager::_drawBookCarousel() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _drawAppIcon — one icon in the app grid
+// _drawMenuList — classic iPod vertical text menu in the bottom zone
+//
+// Selected row: filled black, white label + white ">" chevron.
+// Other rows:   white bg, black label + black ">", thin divider below.
+// Pressing UP from the top row returns to the book carousel zone.
 // ─────────────────────────────────────────────────────────────────────────────
-void UIManager::_drawAppIcon(int16_t cx, int16_t cy, int idx, bool selected) {
+void UIManager::_drawMenuList() {
     EPDDisplay& epd = EPDDisplay::instance();
-    const int16_t half = APP_ICON_SZ / 2;
-    const int16_t x = cx - half, y = cy - half;
-    const int16_t s = APP_ICON_SZ;
 
-    if (selected) {
-        epd.fillRect(x, y, s, s, 0x0000);
-    } else {
-        epd.fillRect(x, y, s, s, 0xFFFF);
-        epd.drawRect(x, y, s, s, 0x0000);
-    }
-    uint16_t fg = selected ? 0xFFFF : 0x0000;
-    int16_t p = s/6, in = s-p*2, ix = x+p, iy = y+p;
+    // Zone divider
+    epd.drawLine(0, MENU_ZONE_TOP, EPD_WIDTH - 1, MENU_ZONE_TOP, 0x0000);
 
-    switch (idx) {
-        case 0: // Library
-            for (int r=0;r<3;++r)
-                epd.drawLine(ix, iy+in/4+r*in/4, ix+in, iy+in/4+r*in/4, fg);
-            break;
-        case 1: // Notes
-            epd.drawRect(ix, iy, in, in, fg);
-            for (int r=0;r<2;++r)
-                epd.drawLine(ix+2, iy+in/4+r*in/3, ix+in-2, iy+in/4+r*in/3, fg);
-            break;
-        case 2: // Stats
-            epd.fillRect(cx-in/3-2, iy+in/2,  in/4, in/2,   fg);
-            epd.fillRect(cx-in/8,   iy+in/3,  in/4, in*2/3, fg);
-            epd.fillRect(cx+in/4+2, iy+in/5,  in/4, in*4/5, fg);
-            break;
-        case 3: // Dict
-            epd.drawLine(cx, iy, cx, iy+in, fg);
-            epd.drawLine(ix, iy+2, cx, iy, fg);
-            epd.drawLine(ix, iy+in, cx, iy+in, fg);
-            epd.drawLine(cx, iy, ix+in, iy+2, fg);
-            epd.drawLine(cx, iy+in, ix+in, iy+in, fg);
-            break;
-        case 4: // Settings
-            epd.drawRect(cx-in/4, cy-in/4, in/2, in/2, fg);
-            epd.drawLine(cx, iy,        cx, iy+in/5,    fg);
-            epd.drawLine(cx, iy+in*4/5, cx, iy+in,      fg);
-            epd.drawLine(ix, cy,        ix+in/5,   cy,  fg);
-            epd.drawLine(ix+in*4/5, cy, ix+in,     cy,  fg);
-            break;
-        default: break;
-    }
-
-    const char* lbl = kMenuItems[idx].label;
-    int16_t lw = epd.getTextWidth(lbl, 10, false);
-    epd.drawText(cx - lw/2, y + s + 12, lbl, 10, false, 0x0000);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// _drawAppGrid — 5-icon row in the bottom zone
-// ─────────────────────────────────────────────────────────────────────────────
-void UIManager::_drawAppGrid() {
-    EPDDisplay& epd = EPDDisplay::instance();
-    epd.drawLine(0, APP_ZONE_TOP - 2, EPD_WIDTH - 1, APP_ZONE_TOP - 2, 0x0000);
-
-    const int16_t step = EPD_WIDTH / MENU_ITEM_COUNT;
-    const int16_t cy   = APP_ZONE_TOP + (EPD_HEIGHT - APP_ZONE_TOP - 24) / 2;
-    const bool    zact = (_homeZone == 1);
+    const bool   zact = (_homeZone == 1);
+    const int16_t rowH = MENU_ROW_H;
+    int16_t y = MENU_ZONE_TOP + 1;
 
     for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
-        int16_t cx = (int16_t)(step / 2 + i * step);
-        _drawAppIcon(cx, cy, i, (i == _menuIndex) && zact);
+        const bool sel = (i == _menuIndex) && zact;
+
+        if (sel) {
+            epd.fillRect(0, y, EPD_WIDTH, rowH, 0x0000);
+        } else {
+            epd.fillRect(0, y, EPD_WIDTH, rowH, 0xFFFF);
+            // Row divider (skip on last row)
+            if (i < MENU_ITEM_COUNT - 1)
+                epd.drawLine(0, y + rowH - 1, EPD_WIDTH - 1, y + rowH - 1, 0x0000);
+        }
+
+        const uint16_t fg   = sel ? 0xFFFF : 0x0000;
+        const int16_t  textY = y + (rowH + 14) / 2;   // vertically centre 14px cap height
+
+        // Label — left-indented
+        epd.drawText(20, textY, kMenuItems[i].label, 16, false, fg);
+
+        // ">" chevron — right-aligned
+        const int16_t cw = epd.getTextWidth(">", 16, false);
+        epd.drawText(EPD_WIDTH - cw - 16, textY, ">", 16, false, fg);
+
+        y += rowH;
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // renderHome
-// Layout: status bar | book carousel | divider | app grid | hint
+// Layout: status bar | Cover Flow book carousel | iPod menu list
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::renderHome() {
     _drawBookCarousel();
-    _drawAppGrid();
-
-    EPDDisplay& epd = EPDDisplay::instance();
-    const char* hint = (_homeZone == 0)
-        ? "L/R: books   DN: apps   SEL: open"
-        : "UP: books   L/R: apps   SEL: open";
-    int16_t hw = epd.getTextWidth(hint, 9, false);
-    epd.drawText((EPD_WIDTH - hw) / 2, EPD_HEIGHT - 6, hint, 9, false, 0x0000);
+    _drawMenuList();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -586,6 +553,24 @@ void UIManager::renderDict() {
                  "Look up: (no keyboard input yet)", 16, false, 0x0000);
     epd.drawText(MARGIN_X, CONTENT_Y + 74,
                  "Connect BLE keyboard to search.", 12, false, 0x0000);
+
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// renderGames
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::renderGames() {
+    EPDDisplay& epd = EPDDisplay::instance();
+
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Games", 20, true, 0x0000);
+    epd.drawLine(MARGIN_X, CONTENT_Y + 20,
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
+
+    epd.drawText(MARGIN_X, CONTENT_Y + 50,
+                 "No games installed.", 16, false, 0x0000);
+    epd.drawText(MARGIN_X, CONTENT_Y + 74,
+                 "Copy game files to /games/ on SD card.", 12, false, 0x0000);
 
     epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }

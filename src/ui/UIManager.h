@@ -12,6 +12,7 @@ enum class Screen : uint8_t {
     SCREEN_SETTINGS,
     SCREEN_NOTES,
     SCREEN_DICT,
+    SCREEN_GAMES,
 };
 
 // ── Button indices — must match InputManager constants exactly ────────────
@@ -39,7 +40,7 @@ public:
     Screen currentScreen() const { return _current; }
     int    selectedMenuItem() const { return _menuIndex; }
 
-    static constexpr int MENU_ITEM_COUNT  = 5;
+    static constexpr int MENU_ITEM_COUNT  = 6;   // Library Notes Stats Dict Settings Games
     static constexpr int RECENT_BOOKS_MAX = 10;
 
     void recordRecentBook(const String& title, const String& filename,
@@ -56,25 +57,25 @@ private:
     void renderSettings();
     void renderNotes();
     void renderDict();
+    void renderGames();
 
     // ── Home helpers ──────────────────────────────────────────────────────
-    // Top zone: book carousel with real covers
+    // Top zone: Cover Flow–style book carousel
     void _drawBookCarousel();
     void _drawBookCard(int16_t cx, int16_t cy, int16_t w, int16_t h,
                        int bookIdx, bool selected, bool zone_active);
-    // Bottom zone: app icons grid
-    void _drawAppGrid();
-    void _drawAppIcon(int16_t cx, int16_t cy, int itemIndex, bool selected);
+    // Bottom zone: classic iPod vertical text menu
+    void _drawMenuList();
 
     // ── Shared ────────────────────────────────────────────────────────────
     void drawStatusBar();
 
     // ── State ─────────────────────────────────────────────────────────────
-    Screen _current  = Screen::SCREEN_HOME;
+    Screen _current   = Screen::SCREEN_HOME;
     std::vector<Screen> _history;
     bool   _dirty     = true;
-    int    _menuIndex = 0;   // selected app in grid (0–4)
-    int    _homeZone  = 0;   // 0=book carousel, 1=app grid
+    int    _menuIndex = 0;   // selected row in iPod menu (0 – MENU_ITEM_COUNT-1)
+    int    _homeZone  = 0;   // 0=book carousel, 1=menu list
     int    _bookIndex = 0;   // selected book in carousel
 
     struct RecentBook {
@@ -90,7 +91,7 @@ private:
     static constexpr int16_t STATUS_H  = 20;
     static constexpr int16_t CONTENT_Y = STATUS_H + 2;
 
-    // Book carousel zone (top half of screen)
+    // Book carousel zone (top half)
     static constexpr int16_t BOOK_ZONE_TOP = CONTENT_Y;
     static constexpr int16_t BOOK_ZONE_BOT = 270;
     static constexpr int16_t BOOK_SEL_W    = 130;
@@ -100,7 +101,7 @@ private:
     static constexpr int16_t BOOK_GHOST_W  =  48;
     static constexpr int16_t BOOK_GHOST_H  =  64;
 
-    // App grid zone (bottom half of screen)
-    static constexpr int16_t APP_ZONE_TOP  = 278;
-    static constexpr int16_t APP_ICON_SZ   =  52;
+    // iPod menu list zone (bottom half)
+    static constexpr int16_t MENU_ZONE_TOP = 276;
+    static constexpr int16_t MENU_ROW_H    =  34;   // px per row
 };

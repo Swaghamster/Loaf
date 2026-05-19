@@ -112,57 +112,139 @@
   <div style="position:absolute;top:258px;left:397px;width:4px;height:4px;border:1px solid #555;"></div>
   <div style="position:absolute;top:258px;left:407px;width:4px;height:4px;border:1px solid #555;"></div>
 
-  <!-- ── Divider (APP_ZONE_TOP-2 = 276) ───────────────────────────────────── -->
+  <!-- ── iPod menu list (MENU_ZONE_TOP=276, ROW_H=34, 6 rows) ─────────────
+       Rows: Library 277, Notes 311, Stats 345, Dictionary 379,
+             Settings 413, Games 447
+       Book zone is active here so no row is highlighted (all plain).
+  ────────────────────────────────────────────────────────────────────────── -->
   <div class="hline" style="top:276px;"></div>
 
-  <!-- ── App grid (cy=367, step=160, first cx=80, icon 52×52) ─────────────── -->
-
-  <!-- Library (cx=80, not selected) -->
-  <div style="position:absolute;left:54px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:7px;top:14px;right:7px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:7px;top:23px;right:11px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:7px;top:32px;right:9px;height:1px;background:#111;"></div>
+  <!-- Library (not highlighted — book zone active) -->
+  <div style="position:absolute;top:277px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:295px;">Library</span>
+    <span class="text f16" style="right:16px;top:295px;">&gt;</span>
+    <div class="hline" style="top:310px;"></div>
   </div>
-  <span class="text f9" style="left:58px;top:405px;">Library</span>
 
-  <!-- Notes (cx=240, not selected) -->
-  <div style="position:absolute;left:214px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:8px;top:8px;width:34px;height:30px;border:1px solid #111;"></div>
-    <div style="position:absolute;left:13px;top:16px;right:13px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:13px;top:24px;right:17px;height:1px;background:#111;"></div>
+  <!-- Notes -->
+  <div style="position:absolute;top:311px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:329px;">Notes</span>
+    <span class="text f16" style="right:16px;top:329px;">&gt;</span>
+    <div class="hline" style="top:344px;"></div>
   </div>
-  <span class="text f9" style="left:224px;top:405px;">Notes</span>
 
-  <!-- Stats (cx=400, SELECTED — book zone active so app zone NOT highlighted) -->
-  <div style="position:absolute;left:374px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:7px;top:28px;width:11px;height:16px;background:#111;"></div>
-    <div style="position:absolute;left:21px;top:20px;width:11px;height:24px;background:#111;"></div>
-    <div style="position:absolute;left:35px;top:12px;width:11px;height:32px;background:#111;"></div>
+  <!-- Stats -->
+  <div style="position:absolute;top:345px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:363px;">Stats</span>
+    <span class="text f16" style="right:16px;top:363px;">&gt;</span>
+    <div class="hline" style="top:378px;"></div>
   </div>
-  <span class="text f9" style="left:384px;top:405px;">Stats</span>
 
-  <!-- Dict (cx=560, not selected) -->
-  <div style="position:absolute;left:534px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:26px;top:9px;width:1px;height:32px;background:#111;"></div>
-    <div style="position:absolute;left:9px;top:9px;width:17px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:9px;top:41px;width:17px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:27px;top:9px;width:17px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:27px;top:41px;width:17px;height:1px;background:#111;"></div>
+  <!-- Dictionary -->
+  <div style="position:absolute;top:379px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:397px;">Dictionary</span>
+    <span class="text f16" style="right:16px;top:397px;">&gt;</span>
+    <div class="hline" style="top:412px;"></div>
   </div>
-  <span class="text f9" style="left:540px;top:405px;">Dict</span>
 
-  <!-- Settings (cx=720, not selected) -->
-  <div style="position:absolute;left:694px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:17px;top:17px;width:18px;height:18px;border:1px solid #111;"></div>
-    <div style="position:absolute;left:25px;top:8px;width:1px;height:8px;background:#111;"></div>
-    <div style="position:absolute;left:25px;top:36px;width:1px;height:8px;background:#111;"></div>
-    <div style="position:absolute;left:8px;top:25px;width:8px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:36px;top:25px;width:8px;height:1px;background:#111;"></div>
+  <!-- Settings -->
+  <div style="position:absolute;top:413px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:431px;">Settings</span>
+    <span class="text f16" style="right:16px;top:431px;">&gt;</span>
+    <div class="hline" style="top:446px;"></div>
   </div>
-  <span class="text f9" style="left:694px;top:405px;">Settings</span>
 
-  <!-- ── Bottom hint (book zone active) ───────────────────────────────────── -->
-  <span class="text f9" style="left:236px;top:470px;">L/R: books   DN: apps   SEL: open</span>
+  <!-- Games -->
+  <div style="position:absolute;top:447px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:465px;">Games</span>
+    <span class="text f16" style="right:16px;top:465px;">&gt;</span>
+  </div>
+</div>
+
+<!-- ── Same screen, menu zone active (Library highlighted) ─────────────── -->
+<h2>1b — Home Screen (menu zone active, Library selected)</h2>
+<div class="screen">
+
+  <!-- Status bar -->
+  <div style="position:absolute;top:0;left:0;right:0;height:20px;border-bottom:1px solid #111;">
+    <div style="position:absolute;left:4px;top:4px;width:18px;height:12px;border:1px solid #111;"></div>
+    <div style="position:absolute;left:6px;top:6px;width:11px;height:8px;background:#111;"></div>
+    <div style="position:absolute;left:23px;top:7px;width:2px;height:6px;background:#111;"></div>
+    <span class="text f9" style="left:32px;top:14px;">3 notes</span>
+    <span class="text f9" style="right:6px;top:14px;">0:04</span>
+  </div>
+
+  <!-- Book carousel (same as above, no active selection ring since zone=1) -->
+  <div style="position:absolute;left:66px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(170deg,#111 0,#111 2px,#e8e4da 2px,#e8e4da 5px,#888 5px,#888 7px,#e8e4da 7px,#e8e4da 10px);"></div>
+  </div>
+  <div style="position:absolute;left:180px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#f4f0e6;opacity:.8;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#f4f0e6;font-size:8px;font-weight:bold;line-height:11px;">NEURO<br>MANCER</span>
+  </div>
+  <!-- Centre card — no double ring (zone inactive) -->
+  <div style="position:absolute;left:270px;top:61px;width:130px;height:170px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:75px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:115px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:8px;width:8px;height:25px;background:#111;"></div>
+    <div style="position:absolute;left:18px;top:12px;width:12px;height:21px;background:#555;"></div>
+    <span style="position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:9px;font-weight:bold;color:#111;line-height:12px;">The Midnight<br>Library</span>
+  </div>
+  <div style="position:absolute;left:536px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <div style="position:absolute;left:8px;top:28px;right:8px;height:3px;background:#111;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#111;font-size:8px;font-weight:bold;line-height:11px;">SNOW<br>CRASH</span>
+  </div>
+  <div style="position:absolute;left:686px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <span style="position:absolute;bottom:4px;left:3px;color:#f4f0e6;font-size:7px;">1984</span>
+  </div>
+
+  <!-- Divider -->
+  <div class="hline" style="top:276px;"></div>
+
+  <!-- Library — SELECTED (filled black, white text) -->
+  <div style="position:absolute;top:277px;left:0;right:0;height:34px;background:#111;">
+    <span class="texti f16" style="left:20px;top:295px;">Library</span>
+    <span class="texti f16" style="right:16px;top:295px;">&gt;</span>
+  </div>
+
+  <!-- Notes -->
+  <div style="position:absolute;top:311px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:329px;">Notes</span>
+    <span class="text f16" style="right:16px;top:329px;">&gt;</span>
+    <div class="hline" style="top:344px;"></div>
+  </div>
+
+  <!-- Stats -->
+  <div style="position:absolute;top:345px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:363px;">Stats</span>
+    <span class="text f16" style="right:16px;top:363px;">&gt;</span>
+    <div class="hline" style="top:378px;"></div>
+  </div>
+
+  <!-- Dictionary -->
+  <div style="position:absolute;top:379px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:397px;">Dictionary</span>
+    <span class="text f16" style="right:16px;top:397px;">&gt;</span>
+    <div class="hline" style="top:412px;"></div>
+  </div>
+
+  <!-- Settings -->
+  <div style="position:absolute;top:413px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:431px;">Settings</span>
+    <span class="text f16" style="right:16px;top:431px;">&gt;</span>
+    <div class="hline" style="top:446px;"></div>
+  </div>
+
+  <!-- Games -->
+  <div style="position:absolute;top:447px;left:0;right:0;height:34px;background:#f4f0e6;">
+    <span class="text f16" style="left:20px;top:465px;">Games</span>
+    <span class="text f16" style="right:16px;top:465px;">&gt;</span>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
