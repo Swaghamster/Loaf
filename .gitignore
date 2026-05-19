@@ -1,0 +1,15 @@
+# PlatformIO build artifacts
+.pio/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Generated font headers (produced by scripts/generate_fonts.sh)
+src/fonts/ShareTechMono_*.h
+src/fonts/Orbitron_*.h
