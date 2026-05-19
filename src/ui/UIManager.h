@@ -13,6 +13,7 @@ enum class Screen : uint8_t {
     SCREEN_NOTES,
     SCREEN_DICT,
     SCREEN_GAMES,
+    SCREEN_APPS,
 };
 
 // ── Button indices — must match InputManager constants exactly ────────────
@@ -40,7 +41,7 @@ public:
     Screen currentScreen() const { return _current; }
     int    selectedMenuItem() const { return _menuIndex; }
 
-    static constexpr int MENU_ITEM_COUNT  = 6;   // Library Notes Stats Dict Settings Games
+    static constexpr int MENU_ITEM_COUNT  = 7;   // Library Notes Stats Dict Settings Games Apps
     static constexpr int RECENT_BOOKS_MAX = 10;
 
     void recordRecentBook(const String& title, const String& filename,
@@ -58,6 +59,7 @@ private:
     void renderNotes();
     void renderDict();
     void renderGames();
+    void renderApps();
 
     // ── Home helpers ──────────────────────────────────────────────────────
     // Top zone: Cover Flow–style book carousel
@@ -103,5 +105,5 @@ private:
 
     // iPod menu list zone (bottom half)
     static constexpr int16_t MENU_ZONE_TOP = 276;
-    static constexpr int16_t MENU_ROW_H    =  34;   // px per row
+    static constexpr int16_t MENU_ROW_H    =  29;   // px per row  (7 rows × 29 = 203 ≤ 204px zone)
 };

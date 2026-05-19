@@ -112,52 +112,45 @@
   <div style="position:absolute;top:258px;left:397px;width:4px;height:4px;border:1px solid #555;"></div>
   <div style="position:absolute;top:258px;left:407px;width:4px;height:4px;border:1px solid #555;"></div>
 
-  <!-- ── iPod menu list (MENU_ZONE_TOP=276, ROW_H=34, 6 rows) ─────────────
-       Rows: Library 277, Notes 311, Stats 345, Dictionary 379,
-             Settings 413, Games 447
-       Book zone is active here so no row is highlighted (all plain).
+  <!-- ── iPod menu list (MENU_ZONE_TOP=276, ROW_H=29, 7 rows) ─────────────
+       Rows start at 277, each 29px: 277 306 335 364 393 422 451
+       Book zone active → no row highlighted.
   ────────────────────────────────────────────────────────────────────────── -->
   <div class="hline" style="top:276px;"></div>
 
-  <!-- Library (not highlighted — book zone active) -->
-  <div style="position:absolute;top:277px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:295px;">Library</span>
-    <span class="text f16" style="right:16px;top:295px;">&gt;</span>
-    <div class="hline" style="top:310px;"></div>
+  <div style="position:absolute;top:277px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:291px;">Library</span>
+    <span class="text f12" style="right:16px;top:291px;">&gt;</span>
+    <div class="hline" style="top:305px;"></div>
   </div>
-
-  <!-- Notes -->
-  <div style="position:absolute;top:311px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:329px;">Notes</span>
-    <span class="text f16" style="right:16px;top:329px;">&gt;</span>
-    <div class="hline" style="top:344px;"></div>
+  <div style="position:absolute;top:306px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:320px;">Notes</span>
+    <span class="text f12" style="right:16px;top:320px;">&gt;</span>
+    <div class="hline" style="top:334px;"></div>
   </div>
-
-  <!-- Stats -->
-  <div style="position:absolute;top:345px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:363px;">Stats</span>
-    <span class="text f16" style="right:16px;top:363px;">&gt;</span>
-    <div class="hline" style="top:378px;"></div>
+  <div style="position:absolute;top:335px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:349px;">Stats</span>
+    <span class="text f12" style="right:16px;top:349px;">&gt;</span>
+    <div class="hline" style="top:363px;"></div>
   </div>
-
-  <!-- Dictionary -->
-  <div style="position:absolute;top:379px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:397px;">Dictionary</span>
-    <span class="text f16" style="right:16px;top:397px;">&gt;</span>
-    <div class="hline" style="top:412px;"></div>
+  <div style="position:absolute;top:364px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:378px;">Dictionary</span>
+    <span class="text f12" style="right:16px;top:378px;">&gt;</span>
+    <div class="hline" style="top:392px;"></div>
   </div>
-
-  <!-- Settings -->
-  <div style="position:absolute;top:413px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:431px;">Settings</span>
-    <span class="text f16" style="right:16px;top:431px;">&gt;</span>
-    <div class="hline" style="top:446px;"></div>
+  <div style="position:absolute;top:393px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:407px;">Settings</span>
+    <span class="text f12" style="right:16px;top:407px;">&gt;</span>
+    <div class="hline" style="top:421px;"></div>
   </div>
-
-  <!-- Games -->
-  <div style="position:absolute;top:447px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:465px;">Games</span>
-    <span class="text f16" style="right:16px;top:465px;">&gt;</span>
+  <div style="position:absolute;top:422px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:436px;">Games</span>
+    <span class="text f12" style="right:16px;top:436px;">&gt;</span>
+    <div class="hline" style="top:450px;"></div>
+  </div>
+  <div style="position:absolute;top:451px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:465px;">Apps</span>
+    <span class="text f12" style="right:16px;top:465px;">&gt;</span>
   </div>
 </div>
 
@@ -206,44 +199,39 @@
   <!-- Divider -->
   <div class="hline" style="top:276px;"></div>
 
-  <!-- Library — SELECTED (filled black, white text) -->
-  <div style="position:absolute;top:277px;left:0;right:0;height:34px;background:#111;">
-    <span class="texti f16" style="left:20px;top:295px;">Library</span>
-    <span class="texti f16" style="right:16px;top:295px;">&gt;</span>
+  <!-- Library — SELECTED -->
+  <div style="position:absolute;top:277px;left:0;right:0;height:29px;background:#111;">
+    <span class="texti f12" style="left:20px;top:291px;">Library</span>
+    <span class="texti f12" style="right:16px;top:291px;">&gt;</span>
   </div>
-
-  <!-- Notes -->
-  <div style="position:absolute;top:311px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:329px;">Notes</span>
-    <span class="text f16" style="right:16px;top:329px;">&gt;</span>
-    <div class="hline" style="top:344px;"></div>
+  <div style="position:absolute;top:306px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:320px;">Notes</span>
+    <span class="text f12" style="right:16px;top:320px;">&gt;</span>
+    <div class="hline" style="top:334px;"></div>
   </div>
-
-  <!-- Stats -->
-  <div style="position:absolute;top:345px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:363px;">Stats</span>
-    <span class="text f16" style="right:16px;top:363px;">&gt;</span>
-    <div class="hline" style="top:378px;"></div>
+  <div style="position:absolute;top:335px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:349px;">Stats</span>
+    <span class="text f12" style="right:16px;top:349px;">&gt;</span>
+    <div class="hline" style="top:363px;"></div>
   </div>
-
-  <!-- Dictionary -->
-  <div style="position:absolute;top:379px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:397px;">Dictionary</span>
-    <span class="text f16" style="right:16px;top:397px;">&gt;</span>
-    <div class="hline" style="top:412px;"></div>
+  <div style="position:absolute;top:364px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:378px;">Dictionary</span>
+    <span class="text f12" style="right:16px;top:378px;">&gt;</span>
+    <div class="hline" style="top:392px;"></div>
   </div>
-
-  <!-- Settings -->
-  <div style="position:absolute;top:413px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:431px;">Settings</span>
-    <span class="text f16" style="right:16px;top:431px;">&gt;</span>
-    <div class="hline" style="top:446px;"></div>
+  <div style="position:absolute;top:393px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:407px;">Settings</span>
+    <span class="text f12" style="right:16px;top:407px;">&gt;</span>
+    <div class="hline" style="top:421px;"></div>
   </div>
-
-  <!-- Games -->
-  <div style="position:absolute;top:447px;left:0;right:0;height:34px;background:#f4f0e6;">
-    <span class="text f16" style="left:20px;top:465px;">Games</span>
-    <span class="text f16" style="right:16px;top:465px;">&gt;</span>
+  <div style="position:absolute;top:422px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:436px;">Games</span>
+    <span class="text f12" style="right:16px;top:436px;">&gt;</span>
+    <div class="hline" style="top:450px;"></div>
+  </div>
+  <div style="position:absolute;top:451px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:465px;">Apps</span>
+    <span class="text f12" style="right:16px;top:465px;">&gt;</span>
   </div>
 </div>
 

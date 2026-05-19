@@ -31,6 +31,7 @@ static const MenuItem kMenuItems[UIManager::MENU_ITEM_COUNT] = {
     { "Dictionary", Screen::SCREEN_DICT     },
     { "Settings",   Screen::SCREEN_SETTINGS },
     { "Games",      Screen::SCREEN_GAMES    },
+    { "Apps",       Screen::SCREEN_APPS     },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -127,6 +128,7 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
         case Screen::SCREEN_NOTES:
         case Screen::SCREEN_DICT:
         case Screen::SCREEN_GAMES:
+        case Screen::SCREEN_APPS:
             if (btn == BTN_BACK) {
                 back();
             } else if (btn == BTN_UP || btn == BTN_DOWN) {
@@ -187,6 +189,7 @@ void UIManager::render() {
         case Screen::SCREEN_NOTES:    renderNotes();    break;
         case Screen::SCREEN_DICT:     renderDict();     break;
         case Screen::SCREEN_GAMES:    renderGames();    break;
+        case Screen::SCREEN_APPS:     renderApps();     break;
         default: break;
     }
 
@@ -571,6 +574,24 @@ void UIManager::renderGames() {
                  "No games installed.", 16, false, 0x0000);
     epd.drawText(MARGIN_X, CONTENT_Y + 74,
                  "Copy game files to /games/ on SD card.", 12, false, 0x0000);
+
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// renderApps
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::renderApps() {
+    EPDDisplay& epd = EPDDisplay::instance();
+
+    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Apps", 20, true, 0x0000);
+    epd.drawLine(MARGIN_X, CONTENT_Y + 20,
+                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
+
+    epd.drawText(MARGIN_X, CONTENT_Y + 50,
+                 "No apps installed.", 16, false, 0x0000);
+    epd.drawText(MARGIN_X, CONTENT_Y + 74,
+                 "Copy app files to /apps/ on SD card.", 12, false, 0x0000);
 
     epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }
