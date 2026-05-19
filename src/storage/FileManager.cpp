@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include <SDCardManager.h>
-#include <cctype>    // tolower
-#include <cstring>   // strlen, strrchr
+#include <algorithm>  // std::sort
+#include <cctype>     // tolower
+#include <cstring>    // strlen, strcasecmp
 
 // Convenience alias for the SDCardManager singleton.
 #define SdMan SDCardManager::getInstance()

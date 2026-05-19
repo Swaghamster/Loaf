@@ -49,12 +49,14 @@ void UIManager::init() {
 // ─────────────────────────────────────────────────────────────────────────────
 // handleButton
 //
-// Button index  GPIO  Role
-// ──────────────────────────────────────────────
-//  BTN_UP    0   GPIO 0   Previous item / page up
-//  BTN_DOWN  1   GPIO 1   Next item / page down
-//  BTN_SELECT 2  GPIO 3   Confirm / enter
-//  BTN_BACK  3   GPIO 20  Back / cancel
+// Button index  InputManager index  Role
+// ──────────────────────────────────────────────────────
+//  BTN_BACK   0  (ADC1, BACK)       Back / cancel
+//  BTN_SELECT 1  (ADC1, CONFIRM)    Confirm / enter
+//  BTN_LEFT   2  (ADC1, LEFT)       Left (not used in all screens)
+//  BTN_RIGHT  3  (ADC1, RIGHT)      Right (not used in all screens)
+//  BTN_UP     4  (ADC2, UP)         Previous item / page up
+//  BTN_DOWN   5  (ADC2, DOWN)       Next item / page down
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::handleButton(uint8_t btn, bool longPress) {
     switch (_current) {

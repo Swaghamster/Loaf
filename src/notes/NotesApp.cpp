@@ -43,10 +43,8 @@ void NotesApp::render() {
     }
 
     // ── White canvas ──────────────────────────────────────────
-    auto& raw = epd.canvas();
     epd.clear();
-    do {
-        
+    {
 
         _drawHeader();
 
@@ -79,8 +77,7 @@ void NotesApp::render() {
                          12, false, 0x0000);
         }
 
-    epd.update();
-
+    }
     epd.update();
 }
 
@@ -218,7 +215,6 @@ void NotesApp::refreshList() {
 
 void NotesApp::_drawHeader() {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     // Filled header bar
     epd.canvas().fillRect(0, 0, EPD_WIDTH, HEADER_H, 0x0000);
@@ -234,7 +230,6 @@ void NotesApp::_drawHeader() {
 
 void NotesApp::_drawNoteRow(int16_t y, const NoteEntry& entry, bool selected) {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     // Selection highlight
     if (selected) {
@@ -284,13 +279,10 @@ void NotesApp::_drawEmpty() {
 
 void NotesApp::_drawDeleteDialog(const String& title) {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     epd.clear();
-    do {
-        
 
-        // Dialog box
+    // Dialog box
         int16_t dx = 40, dy = 80, dw = EPD_WIDTH - 80, dh = 140;
         epd.canvas().fillRect(dx, dy, dw, dh, 0xFFFF);
         epd.canvas().drawRect(dx, dy, dw, dh, 0x0000);
@@ -329,7 +321,7 @@ void NotesApp::_drawDeleteDialog(const String& title) {
                      "UP/DN: choose  SEL: confirm  BACK: cancel",
                      12, false, 0x0000);
     epd.update();
-}
+}  // _drawDeleteDialog
 
 // ── Private: static helpers ────────────────────────────────────
 

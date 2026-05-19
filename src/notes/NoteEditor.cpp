@@ -163,28 +163,24 @@ void NoteEditor::render() {
     }
 
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     bool useFullRefresh = _needsFullRedraw;
     _needsFullRedraw = false;
 
     if (useFullRefresh) {
         epd.clear();
-        do {
-            
-            _renderTextArea();
-            if (_mode == EditorMode::SOFT_KEYBOARD) {
-                _renderSoftKeyboard(/*doPartialFlush=*/false);
-            } else {
-                // BLE keyboard mode: show slim status bar at bottom
-                int16_t barY = EPD_HEIGHT - 20;
-                epd.canvas().drawFastHLine(0, barY, EPD_WIDTH, 0x0000);
-                String kbName = BLEKeyboardHost::instance().getConnectedDeviceName();
-                String hint   = "BT: " + (kbName.isEmpty() ? String("connected") : kbName);
-                hint += "  MENU=options";
-                epd.drawText(MARGIN_X, barY + 14, hint.c_str(), 12, false, 0x0000);
-            }
-        epd.update();
+        _renderTextArea();
+        if (_mode == EditorMode::SOFT_KEYBOARD) {
+            _drawSoftKeyboardContent(epd);
+        } else {
+            // BLE keyboard mode: show slim status bar at bottom
+            int16_t barY = EPD_HEIGHT - 20;
+            epd.drawLine(0, barY, EPD_WIDTH - 1, barY, 0x0000);
+            String kbName = BLEKeyboardHost::instance().getConnectedDeviceName();
+            String hint   = "BT: " + (kbName.isEmpty() ? String("connected") : kbName);
+            hint += "  MENU=options";
+            epd.drawText(MARGIN_X, barY + 14, hint.c_str(), 12, false, 0x0000);
+        }
         epd.update();
     }
 }
@@ -461,67 +457,63 @@ void NoteEditor::openBTKeyboardMenu() {
 
 void NoteEditor::renderBTMenu() {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
     BLEKeyboardHost& kb = BLEKeyboardHost::instance();
     BLEKBState state = kb.getState();
 
     epd.clear();
-    do {
-        
 
-        // ── Header ────────────────────────────────────────────
-        epd.canvas().fillRect(0, 0, EPD_WIDTH, 28, 0x0000);
-        epd.drawText(MARGIN_X, 21, "Connect Bluetooth Keyboard", 16, true, 0xFFFF);
+    // ── Header ────────────────────────────────────────────
+    epd.fillRect(0, 0, EPD_WIDTH, 28, 0x0000);
+    epd.drawText(MARGIN_X, 21, "Connect Bluetooth Keyboard", 16, true, 0xFFFF);
 
-        // ── Scanning indicator ────────────────────────────────
-        static const char* spinners[] = { "|", "/", "-", "\\" };
-        if (state == BLEKBState::BLE_KB_SCANNING) {
-            String msg = String("Scanning... ") +
-                         spinners[_scanSpinnerIdx % 4];
-            epd.drawText(MARGIN_X, 55, msg.c_str(), 16, false, 0x0000);
+    // ── Scanning indicator ────────────────────────────────
+    static const char* spinners[] = { "|", "/", "-", "\\" };
+    if (state == BLEKBState::BLE_KB_SCANNING) {
+        String msg = String("Scanning... ") +
+                     spinners[_scanSpinnerIdx % 4];
+        epd.drawText(MARGIN_X, 55, msg.c_str(), 16, false, 0x0000);
+        epd.drawText(MARGIN_X, 75,
+                     "Looking for HID keyboards nearby.",
+                     12, false, 0x0000);
+    } else {
+        // Scan complete — show results
+        auto results = kb.getScanResults();
+
+        if (results.empty()) {
+            epd.drawText(MARGIN_X, 55,
+                         "No keyboards found.", 16, false, 0x0000);
             epd.drawText(MARGIN_X, 75,
-                         "Looking for HID keyboards nearby.",
+                         "Make sure keyboard is in pairing mode,",
+                         12, false, 0x0000);
+            epd.drawText(MARGIN_X, 91,
+                         "then press BACK and try again.",
                          12, false, 0x0000);
         } else {
-            // Scan complete — show results
-            auto results = kb.getScanResults();
+            epd.drawText(MARGIN_X, 50, "Found keyboards:", 12, true, 0x0000);
 
-            if (results.empty()) {
-                epd.drawText(MARGIN_X, 55,
-                             "No keyboards found.", 16, false, 0x0000);
-                epd.drawText(MARGIN_X, 75,
-                             "Make sure keyboard is in pairing mode,",
-                             12, false, 0x0000);
-                epd.drawText(MARGIN_X, 91,
-                             "then press BACK and try again.",
-                             12, false, 0x0000);
-            } else {
-                epd.drawText(MARGIN_X, 50, "Found keyboards:", 12, true, 0x0000);
-
-                int16_t y = 66;
-                for (int i = 0; i < static_cast<int>(results.size()); ++i) {
-                    bool sel = (i == _btScanSelected);
-                    if (sel) {
-                        epd.canvas().fillRect(0, y - 14, EPD_WIDTH, 18, 0x0000);
-                    }
-                    uint16_t tc = sel ? 0xFFFF : 0x0000;
-                    String label = results[i].name;
-                    if (label.isEmpty()) label = results[i].address;
-                    label += "  RSSI:" + String(results[i].rssi) + "dBm";
-                    epd.drawText(MARGIN_X, y, label.c_str(), 12, false, tc);
-                    y += 20;
-                    if (y > EPD_HEIGHT - 30) break;
+            int16_t y = 66;
+            for (int i = 0; i < static_cast<int>(results.size()); ++i) {
+                bool sel = (i == _btScanSelected);
+                if (sel) {
+                    epd.fillRect(0, y - 14, EPD_WIDTH, 18, 0x0000);
                 }
+                uint16_t tc = sel ? 0xFFFF : 0x0000;
+                String label = results[i].name;
+                if (label.isEmpty()) label = results[i].address;
+                label += "  RSSI:" + String(results[i].rssi) + "dBm";
+                epd.drawText(MARGIN_X, y, label.c_str(), 12, false, tc);
+                y += 20;
+                if (y > EPD_HEIGHT - 30) break;
             }
         }
+    }
 
-        // ── Footer ────────────────────────────────────────────
-        epd.canvas().drawFastHLine(0, EPD_HEIGHT - 20, EPD_WIDTH, 0x0000);
-        epd.drawText(MARGIN_X, EPD_HEIGHT - 6,
-                     "UP/DN: select  SEL: connect  BACK: cancel",
-                     12, false, 0x0000);
+    // ── Footer ────────────────────────────────────────────
+    epd.drawLine(0, EPD_HEIGHT - 20, EPD_WIDTH - 1, EPD_HEIGHT - 20, 0x0000);
+    epd.drawText(MARGIN_X, EPD_HEIGHT - 6,
+                 "UP/DN: select  SEL: connect  BACK: cancel",
+                 12, false, 0x0000);
 
-    epd.update();
     epd.update();
 }
 
@@ -529,10 +521,9 @@ void NoteEditor::renderBTMenu() {
 
 void NoteEditor::_renderTextArea() {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     // ── Status bar ─────────────────────────────────────────────
-    epd.canvas().fillRect(0, 0, EPD_WIDTH, STATUS_BAR_H, 0x0000);
+    epd.fillRect(0, 0, EPD_WIDTH, STATUS_BAR_H, 0x0000);
     {
         // Left: filename (truncated)
         String name = _filename;
@@ -584,7 +575,7 @@ void NoteEditor::_renderTextArea() {
                          epd.getTextWidth(beforeCursor.c_str(), TEXT_FONT_SZ, false);
             int16_t cy = y - LINE_H + 2;
             if (_cursorVisible) {
-                epd.canvas().fillRect(cx, cy, 2, LINE_H - 2, 0x0000);
+                epd.fillRect(cx, cy, 2, LINE_H - 2, 0x0000);
             }
         }
 
@@ -593,31 +584,28 @@ void NoteEditor::_renderTextArea() {
 
     // Divider between text area and keyboard / status area
     int16_t divY = EPD_HEIGHT - (_mode == EditorMode::SOFT_KEYBOARD ? KEYBOARD_H : 20);
-    epd.canvas().drawFastHLine(0, divY, EPD_WIDTH, 0x0000);
+    epd.drawLine(0, divY, EPD_WIDTH - 1, divY, 0x0000);
 }
 
 void NoteEditor::_renderSoftKeyboard(bool doPartialFlush) {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
-    // When called as standalone: draw to canvas then partial-refresh.
-    // When called from inside a full-refresh loop the caller owns the page pump.
     if (doPartialFlush) {
+        // Draw keyboard content into the framebuffer, then flush just the
+        // keyboard region via partial refresh.
         _drawSoftKeyboardContent(epd);
-    epd.updatePartial(0, KB_TOP, EPD_WIDTH, KEYBOARD_H);
+        epd.updatePartial(0, KB_TOP, EPD_WIDTH, KEYBOARD_H);
         return;
     }
 
-    // When called during a full render: just draw to canvas (flush happens at end).
+    // Called during a full redraw — draw directly into the shared framebuffer.
     _drawSoftKeyboardContent(epd);
 }
 
 void NoteEditor::_drawSoftKeyboardContent(EPDDisplay& epd) {
-    auto& raw = epd.canvas();
-
     // Clear keyboard area
-    epd.canvas().fillRect(0, KB_TOP, EPD_WIDTH, KEYBOARD_H, 0xFFFF);
-    epd.canvas().drawFastHLine(0, KB_TOP, EPD_WIDTH, 0x0000);
+    epd.fillRect(0, KB_TOP, EPD_WIDTH, KEYBOARD_H, 0xFFFF);
+    epd.drawLine(0, KB_TOP, EPD_WIDTH - 1, KB_TOP, 0x0000);
 
     // Shift / CapsLock indicator in top-right of keyboard area
     {
@@ -639,11 +627,11 @@ void NoteEditor::_drawSoftKeyboardContent(EPDDisplay& epd) {
 
             // Key background
             if (selected) {
-                epd.canvas().fillRect(kx, ky, kw, kh, 0x0000);
+                epd.fillRect(kx, ky, kw, kh, 0x0000);
             } else {
-                epd.canvas().fillRect(kx, ky, kw, kh, 0xFFFF);
+                epd.fillRect(kx, ky, kw, kh, 0xFFFF);
             }
-            epd.canvas().drawRect(kx, ky, kw, kh, 0x0000);
+            epd.drawRect(kx, ky, kw, kh, 0x0000);
 
             // Key label
             uint16_t tc = selected ? 0xFFFF : 0x0000;
@@ -684,12 +672,9 @@ void NoteEditor::_drawSoftKeyboardContent(EPDDisplay& epd) {
         }
     }
 }
-// NOTE: _drawSoftKeyboardContent ends here.
-// The actual display commit (partial or full) is handled by _renderSoftKeyboard.
 
 void NoteEditor::_renderMenu() {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     static const char* const MENU_ITEMS[MENU_ITEM_COUNT] = {
         "Save",
@@ -698,62 +683,55 @@ void NoteEditor::_renderMenu() {
     };
 
     epd.clear();
-    do {
-        
 
-        // Dialog box
-        int16_t dx = 60, dy = 60, dw = EPD_WIDTH - 120, dh = 180;
-        epd.canvas().fillRect(dx, dy, dw, dh, 0xFFFF);
-        epd.canvas().drawRect(dx, dy, dw, dh, 0x0000);
-        epd.canvas().drawRect(dx + 1, dy + 1, dw - 2, dh - 2, 0x0000);
+    // Dialog box
+    int16_t dx = 60, dy = 60, dw = EPD_WIDTH - 120, dh = 180;
+    epd.fillRect(dx, dy, dw, dh, 0xFFFF);
+    epd.drawRect(dx, dy, dw, dh, 0x0000);
+    epd.drawRect(dx + 1, dy + 1, dw - 2, dh - 2, 0x0000);
 
-        // Title
-        epd.canvas().fillRect(dx, dy, dw, 26, 0x0000);
-        epd.drawText(dx + 10, dy + 18, "Editor Menu", 16, true, 0xFFFF);
+    // Title
+    epd.fillRect(dx, dy, dw, 26, 0x0000);
+    epd.drawText(dx + 10, dy + 18, "Editor Menu", 16, true, 0xFFFF);
 
-        // Menu items
-        int16_t iy = dy + 42;
-        for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
-            bool sel = (i == _menuSelected);
-            if (sel) {
-                epd.canvas().fillRect(dx + 2, iy - 14, dw - 4, 20, 0x0000);
-            }
-            uint16_t tc = sel ? 0xFFFF : 0x0000;
-            epd.drawText(dx + 12, iy, MENU_ITEMS[i], 16, sel, tc);
-            iy += 28;
+    // Menu items
+    int16_t iy = dy + 42;
+    for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
+        bool sel = (i == _menuSelected);
+        if (sel) {
+            epd.fillRect(dx + 2, iy - 14, dw - 4, 20, 0x0000);
         }
+        uint16_t tc = sel ? 0xFFFF : 0x0000;
+        epd.drawText(dx + 12, iy, MENU_ITEMS[i], 16, sel, tc);
+        iy += 28;
+    }
 
-        // Divider + hint
-        epd.canvas().drawFastHLine(dx, dy + dh - 24, dw, 0x0000);
-        epd.drawText(dx + 10, dy + dh - 8,
-                     "UP/DN: move  SEL: confirm  BACK: close",
-                     12, false, 0x0000);
+    // Divider + hint
+    epd.drawLine(dx, dy + dh - 24, dx + dw - 1, dy + dh - 24, 0x0000);
+    epd.drawText(dx + 10, dy + dh - 8,
+                 "UP/DN: move  SEL: confirm  BACK: close",
+                 12, false, 0x0000);
 
-    epd.update();
     epd.update();
 }
 
 void NoteEditor::_renderBTConnecting() {
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     epd.clear();
-    do {
-        
 
-        int16_t cx = EPD_WIDTH / 2;
-        int16_t cy = EPD_HEIGHT / 2;
+    int16_t cx = EPD_WIDTH / 2;
+    int16_t cy = EPD_HEIGHT / 2;
 
-        String line1 = "Connecting to:";
-        String line2 = _btConnectingName.isEmpty() ? "keyboard..." : _btConnectingName;
+    String line1 = "Connecting to:";
+    String line2 = _btConnectingName.isEmpty() ? "keyboard..." : _btConnectingName;
 
-        int16_t l1w = epd.getTextWidth(line1.c_str(), 16, false);
-        int16_t l2w = epd.getTextWidth(line2.c_str(), 16, true);
+    int16_t l1w = epd.getTextWidth(line1.c_str(), 16, false);
+    int16_t l2w = epd.getTextWidth(line2.c_str(), 16, true);
 
-        epd.drawText(cx - l1w / 2, cy - 12, line1.c_str(), 16, false, 0x0000);
-        epd.drawText(cx - l2w / 2, cy + 12, line2.c_str(), 16, true,  0x0000);
+    epd.drawText(cx - l1w / 2, cy - 12, line1.c_str(), 16, false, 0x0000);
+    epd.drawText(cx - l2w / 2, cy + 12, line2.c_str(), 16, true,  0x0000);
 
-    epd.update();
     epd.update();
 }
 
@@ -768,7 +746,6 @@ void NoteEditor::_blinkCursor() {
     if (curLine < _topLine || curLine >= _topLine + visLines) return;
 
     EPDDisplay& epd = EPDDisplay::instance();
-    auto& raw = epd.canvas();
 
     int lineStart = _lineStarts[curLine];
     String beforeCursor = _buffer.substring(lineStart, lineStart + curCol);
@@ -778,10 +755,11 @@ void NoteEditor::_blinkCursor() {
     int16_t cy  = TEXT_Y_START + (curLine - _topLine) * LINE_H - LINE_H + 2;
     int16_t ch  = LINE_H - 2;
 
-    // Partial-refresh just the 2-pixel cursor column
-    epd.canvas().fillRect(cx, cy, 3, ch,
-                     _cursorVisible ? 0x0000 : 0xFFFF);
-    epd.updatePartial(cx, cy, 3, ch);
+    // Draw the cursor pixel into the framebuffer, then partial-refresh just
+    // the 2-pixel wide cursor column.
+    epd.fillRect(cx, cy, 2, ch,
+                 _cursorVisible ? 0x0000 : 0xFFFF);
+    epd.updatePartial(cx, cy, 2, ch);
 }
 
 // ── Word-wrap ──────────────────────────────────────────────────

@@ -14,11 +14,14 @@ enum class Screen : uint8_t {
     SCREEN_DICT,
 };
 
-// ── Button indices (match GPIO order 0,1,3,20) ───────────────────────────
-static constexpr uint8_t BTN_UP     = 0;  // GPIO 0
-static constexpr uint8_t BTN_DOWN   = 1;  // GPIO 1
-static constexpr uint8_t BTN_SELECT = 2;  // GPIO 3
-static constexpr uint8_t BTN_BACK   = 3;  // GPIO 20
+// ── Button indices — must match InputManager constants exactly ────────────
+// InputManager: BACK=0, CONFIRM=1, LEFT=2, RIGHT=3, UP=4, DOWN=5, POWER=6
+static constexpr uint8_t BTN_BACK   = 0;  // ADC1 lowest resistance
+static constexpr uint8_t BTN_SELECT = 1;  // ADC1 CONFIRM
+static constexpr uint8_t BTN_LEFT   = 2;  // ADC1 LEFT
+static constexpr uint8_t BTN_RIGHT  = 3;  // ADC1 RIGHT
+static constexpr uint8_t BTN_UP     = 4;  // ADC2 UP
+static constexpr uint8_t BTN_DOWN   = 5;  // ADC2 DOWN
 
 // ─────────────────────────────────────────────────────────────────────────────
 // UIManager
