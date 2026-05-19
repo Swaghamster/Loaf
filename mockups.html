@@ -4,376 +4,331 @@
 <meta charset="utf-8">
 <title>Loaf UI Mockups — Xteink X4 (800×480)</title>
 <style>
-  body { background: #888; font-family: sans-serif; padding: 20px; }
-  h2 { color: #fff; margin: 30px 0 8px; }
+  body { background: #777; font-family: sans-serif; padding: 20px; }
+  h2 { color: #fff; margin: 30px 0 6px; font-size:15px; }
   .screen {
     width: 800px; height: 480px;
-    background: #f5f0e8;
-    border: 3px solid #222;
+    background: #f4f0e6;
+    border: 3px solid #111;
     position: relative;
     overflow: hidden;
-    display: inline-block;
+    display: block;
     margin-bottom: 8px;
-    font-family: 'FreeSans', 'Liberation Sans', Arial, sans-serif;
+    font-family: 'Liberation Sans', Arial, sans-serif;
   }
-  .mono { font-family: 'FreeMono', 'Liberation Mono', monospace; }
-
-  /* ── shared ── */
-  .bar  { position:absolute; left:0; right:0; background:#111; color:#f5f0e8; }
   .hline { position:absolute; left:0; right:0; height:1px; background:#222; }
-  .vline { position:absolute; top:0; bottom:0; width:1px; background:#222; }
-  .rect  { position:absolute; border:1px solid #222; }
-  .fill  { position:absolute; background:#111; }
-  .white-fill { position:absolute; background:#f5f0e8; }
   .text  { position:absolute; color:#111; white-space:nowrap; }
-  .text-inv { position:absolute; color:#f5f0e8; white-space:nowrap; }
-  .selected { background:#111; color:#f5f0e8; position:absolute; }
-
-  /* font sizes roughly scaled to 800px canvas */
-  .f9  { font-size:12px; }
-  .f12 { font-size:15px; }
-  .f16 { font-size:19px; }
-  .f20 { font-size:24px; }
-  .f24 { font-size:28px; }
-  .f32 { font-size:38px; }
-  .bold { font-weight:bold; }
-
-  .label { color:#555; font-size:11px; margin:2px 0 2px; }
+  .texti { position:absolute; color:#f4f0e6; white-space:nowrap; }
+  .f9  { font-size:11px; }
+  .f12 { font-size:14px; }
+  .f16 { font-size:18px; }
+  .f20 { font-size:22px; }
+  .f24 { font-size:27px; }
+  .bold{ font-weight:bold; }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>1 — Splash Screen</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 1 — Home  (two-zone layout)
+     Top half: recent-books carousel
+     Bottom strip: app icons row
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>1 — Home Screen</h2>
 <div class="screen">
-  <div class="text bold f32" style="left:340px;top:165px;">Loaf</div>
-  <div class="text f16" style="left:322px;top:210px;">e-ink reader</div>
-  <div class="text f12" style="left:366px;top:240px;">v1.0.0</div>
-  <div class="hline" style="top:268px;left:200px;right:200px;"></div>
+
+  <!-- ── Status bar ──────────────────────────────────────────────────────── -->
+  <div style="position:absolute;top:0;left:0;right:0;height:22px;border-bottom:1px solid #111;">
+    <!-- battery -->
+    <div style="position:absolute;left:4px;top:4px;width:18px;height:12px;border:1px solid #111;"></div>
+    <div style="position:absolute;left:6px;top:6px;width:11px;height:8px;background:#111;"></div>
+    <div style="position:absolute;left:23px;top:7px;width:2px;height:6px;background:#111;"></div>
+    <span class="text f9" style="left:32px;top:13px;">3 notes</span>
+    <span class="text f9" style="right:6px;top:13px;">0:04</span>
+  </div>
+
+  <!-- ── "Recently Read" label ────────────────────────────────────────────── -->
+  <span class="text f12 bold" style="left:16px;top:36px;">Recently Read</span>
+
+  <!-- ── Book carousel (centred, 5 slots) ─────────────────────────────────
+       ghost-L  adj-L  [CENTRE]  adj-R  ghost-R
+       cx offsets from 400: -330, -175, 0, +175, +330
+       sizes: 60, 110, 170, 110, 60  (slightly taller than wide = book shape)
+  ────────────────────────────────────────────────────────────────────────── -->
+
+  <!-- ghost left (cx=70, cy=175) -->
+  <div style="position:absolute;left:40px;top:145px;width:60px;height:80px;border:1px solid #aaa;background:#e8e4da;"></div>
+  <span class="text f9" style="left:44px;top:192px;color:#aaa;">Dune</span>
+
+  <!-- adjacent left (cx=225, cy=175) -->
+  <div style="position:absolute;left:170px;top:120px;width:110px;height:120px;border:2px solid #555;background:#e8e4da;"></div>
+  <div style="position:absolute;left:172px;top:122px;width:106px;height:116px;border:1px solid #555;"></div>
+  <!-- spine lines -->
+  <div style="position:absolute;left:178px;top:130px;width:94px;height:1px;background:#555;"></div>
+  <div style="position:absolute;left:178px;top:140px;width:70px;height:1px;background:#555;"></div>
+  <div style="position:absolute;left:178px;top:150px;width:80px;height:1px;background:#555;"></div>
+  <span class="text f9" style="left:178px;top:253px;">Neuromancer</span>
+
+  <!-- CENTRE selected book (cx=400, cy=175) -->
+  <div style="position:absolute;left:315px;top:90px;width:170px;height:170px;background:#111;"></div>
+  <!-- white book lines on black -->
+  <div style="position:absolute;left:325px;top:108px;width:150px;height:1px;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:325px;top:122px;width:110px;height:1px;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:325px;top:136px;width:130px;height:1px;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:325px;top:150px;width:90px;height:1px;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:325px;top:164px;width:120px;height:1px;background:#f4f0e6;"></div>
+  <span class="texti f16 bold" style="left:327px;top:230px;">The Midnight Library</span>
+  <!-- page indicator -->
+  <span class="text f9" style="left:327px;top:272px;color:#555;">p.42 of 310</span>
+
+  <!-- adjacent right (cx=575, cy=175) -->
+  <div style="position:absolute;left:520px;top:120px;width:110px;height:120px;border:2px solid #555;background:#e8e4da;"></div>
+  <div style="position:absolute;left:522px;top:122px;width:106px;height:116px;border:1px solid #555;"></div>
+  <div style="position:absolute;left:528px;top:130px;width:94px;height:1px;background:#555;"></div>
+  <div style="position:absolute;left:528px;top:140px;width:60px;height:1px;background:#555;"></div>
+  <div style="position:absolute;left:528px;top:150px;width:80px;height:1px;background:#555;"></div>
+  <span class="text f9" style="left:528px;top:253px;">Snow Crash</span>
+
+  <!-- ghost right (cx=730, cy=175) -->
+  <div style="position:absolute;left:700px;top:145px;width:60px;height:80px;border:1px solid #aaa;background:#e8e4da;"></div>
+  <span class="text f9" style="left:704px;top:192px;color:#aaa;">1984</span>
+
+  <!-- ── Dot indicators ────────────────────────────────────────────────────── -->
+  <!-- 5 dots centred -->
+  <div style="position:absolute;top:278px;left:369px;width:8px;height:8px;background:#111;"></div><!-- selected -->
+  <div style="position:absolute;top:279px;left:383px;width:6px;height:6px;border:1px solid #555;"></div>
+  <div style="position:absolute;top:279px;left:395px;width:6px;height:6px;border:1px solid #555;"></div>
+  <div style="position:absolute;top:279px;left:407px;width:6px;height:6px;border:1px solid #555;"></div>
+  <div style="position:absolute;top:279px;left:419px;width:6px;height:6px;border:1px solid #555;"></div>
+
+  <!-- ── Divider between zones ─────────────────────────────────────────────── -->
+  <div class="hline" style="top:295px;"></div>
+
+  <!-- ── App icon strip ────────────────────────────────────────────────────── -->
+  <!-- 5 icons evenly spaced in 800px: step = 160px, first cx = 80 -->
+
+  <!-- Library (cx=80) — NOT selected -->
+  <div style="position:absolute;left:55px;top:312px;width:50px;height:50px;border:2px solid #111;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:57px;top:314px;width:46px;height:46px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:63px;top:323px;width:34px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:63px;top:331px;width:26px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:63px;top:339px;width:30px;height:1px;background:#111;"></div>
+  <span class="text f9" style="left:61px;top:376px;">Library</span>
+
+  <!-- Notes (cx=240) — NOT selected -->
+  <div style="position:absolute;left:215px;top:312px;width:50px;height:50px;border:2px solid #111;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:217px;top:314px;width:46px;height:46px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:221px;top:319px;width:38px;height:34px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:225px;top:325px;width:28px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:225px;top:332px;width:22px;height:1px;background:#111;"></div>
+  <span class="text f9" style="left:223px;top:376px;">Notes</span>
+
+  <!-- Stats (cx=400) — SELECTED (filled) -->
+  <div style="position:absolute;left:375px;top:308px;width:50px;height:50px;background:#111;"></div>
+  <!-- bar chart in white -->
+  <div style="position:absolute;left:383px;top:332px;width:7px;height:18px;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:393px;top:324px;width:7px;height:26px;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:403px;top:318px;width:7px;height:32px;background:#f4f0e6;"></div>
+  <span class="text f9 bold" style="left:383px;top:372px;">Stats</span>
+  <!-- selection underline -->
+  <div style="position:absolute;left:375px;top:363px;width:50px;height:2px;background:#111;"></div>
+
+  <!-- Dict (cx=560) -->
+  <div style="position:absolute;left:535px;top:312px;width:50px;height:50px;border:2px solid #111;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:537px;top:314px;width:46px;height:46px;border:1px solid #111;"></div>
+  <!-- open book lines -->
+  <div style="position:absolute;left:557px;top:322px;width:1px;height:28px;background:#111;"></div>
+  <div style="position:absolute;left:541px;top:322px;width:16px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:541px;top:350px;width:16px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:558px;top:322px;width:16px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:558px;top:350px;width:16px;height:1px;background:#111;"></div>
+  <span class="text f9" style="left:541px;top:376px;">Dictionary</span>
+
+  <!-- Settings (cx=720) -->
+  <div style="position:absolute;left:695px;top:312px;width:50px;height:50px;border:2px solid #111;background:#f4f0e6;"></div>
+  <div style="position:absolute;left:697px;top:314px;width:46px;height:46px;border:1px solid #111;"></div>
+  <!-- gear square + ticks -->
+  <div style="position:absolute;left:709px;top:326px;width:22px;height:22px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:719px;top:318px;width:1px;height:6px;background:#111;"></div>
+  <div style="position:absolute;left:719px;top:350px;width:1px;height:6px;background:#111;"></div>
+  <div style="position:absolute;left:700px;top:337px;width:6px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:733px;top:337px;width:6px;height:1px;background:#111;"></div>
+  <span class="text f9" style="left:695px;top:376px;">Settings</span>
+
+  <!-- ── Bottom hint ──────────────────────────────────────────────────────── -->
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:468px;">L/R: browse books   UP/DN: switch app   SELECT: open</span>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>2 — Home Menu</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 2 — Notes list
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>2 — Notes List</h2>
 <div class="screen">
-  <!-- header bar -->
-  <div class="bar" style="top:0;height:36px;"></div>
-  <div class="text-inv bold f16" style="left:16px;top:24px;">Loaf</div>
-  <div class="text-inv f12" style="right:16px;top:22px;">v1.0.0</div>
+  <div style="position:absolute;top:0;left:0;right:0;height:38px;background:#111;"></div>
+  <span class="texti bold f16" style="left:16px;top:27px;">Notes</span>
+  <span class="texti f12" style="right:16px;top:25px;">4 notes</span>
 
-  <!-- menu items — 5 in a row -->
-  <!-- Library (selected) -->
-  <div class="fill" style="left:40px;top:100px;width:130px;height:130px;border-radius:4px;"></div>
-  <div class="text-inv bold f20" style="left:68px;top:158px;">📚</div>
-  <div class="text-inv f12" style="left:70px;top:185px;">Library</div>
+  <!-- selected row -->
+  <div style="position:absolute;top:38px;left:0;right:0;height:54px;background:#111;"></div>
+  <span class="texti bold f16" style="left:16px;top:62px;">The Midnight Library</span>
+  <span class="texti f12" style="left:16px;top:79px;">Between life and death there is a library...</span>
+  <span class="texti f12" style="right:16px;top:62px;">14KB</span>
+  <div class="hline" style="top:92px;background:#555;"></div>
 
-  <!-- Notes -->
-  <div class="rect" style="left:210px;top:100px;width:130px;height:130px;border-radius:4px;"></div>
-  <div class="text f20" style="left:238px;top:158px;">📝</div>
-  <div class="text f12" style="left:243px;top:185px;">Notes</div>
+  <span class="text bold f16" style="left:16px;top:115px;">Shopping list</span>
+  <span class="text f12" style="left:16px;top:132px;">milk eggs bread coffee oat...</span>
+  <span class="text f12" style="right:16px;top:115px;">512B</span>
+  <div class="hline" style="top:149px;"></div>
 
-  <!-- Stats -->
-  <div class="rect" style="left:380px;top:100px;width:130px;height:130px;border-radius:4px;"></div>
-  <div class="text f20" style="left:408px;top:158px;">📊</div>
-  <div class="text f12" style="left:415px;top:185px;">Stats</div>
+  <span class="text bold f16" style="left:16px;top:171px;">Book ideas</span>
+  <span class="text f12" style="left:16px;top:188px;">1. Neuromancer  2. Snow Crash  3. Blindsight...</span>
+  <span class="text f12" style="right:16px;top:171px;">1KB</span>
+  <div class="hline" style="top:205px;"></div>
 
-  <!-- Dictionary -->
-  <div class="rect" style="left:550px;top:100px;width:130px;height:130px;border-radius:4px;"></div>
-  <div class="text f20" style="left:575px;top:158px;">📖</div>
-  <div class="text f12" style="left:571px;top:185px;">Dictionary</div>
+  <span class="text bold f16" style="left:16px;top:228px;">Meeting notes 2026-05-12</span>
+  <span class="text f12" style="left:16px;top:245px;">Q2 roadmap discussion. Action items: ...</span>
+  <span class="text f12" style="right:16px;top:228px;">3KB</span>
+  <div class="hline" style="top:262px;"></div>
 
-  <!-- Settings -->
-  <div class="rect" style="left:40px;top:270px;width:130px;height:130px;border-radius:4px;"></div>
-  <div class="text f20" style="left:68px;top:328px;">⚙️</div>
-  <div class="text f12" style="left:63px;top:355px;">Settings</div>
-
-  <!-- footer hint -->
-  <div class="hline" style="top:438px;"></div>
-  <div class="text f9" style="left:16px;top:452px;">UP/DN: navigate   SEL: open</div>
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:467px;">UP/DN: scroll   SEL: open   MENU: new   SEL long: delete</span>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>3 — Notes List</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 3 — Reader (bionic mode)
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>3 — Reader (Bionic Reading)</h2>
 <div class="screen">
-  <!-- header -->
-  <div class="bar" style="top:0;height:40px;"></div>
-  <div class="text-inv bold f16" style="left:16px;top:28px;">Notes</div>
-  <div class="text-inv f12" style="right:16px;top:26px;">4 notes</div>
+  <div style="position:absolute;top:0;left:0;right:0;height:22px;background:#111;"></div>
+  <span class="texti f12" style="left:16px;top:16px;">The Midnight Library</span>
+  <span class="texti f12" style="right:16px;top:16px;">p. 42 / 310</span>
 
-  <!-- row 0: selected -->
-  <div class="fill" style="top:40px;height:55px;"></div>
-  <div class="text-inv bold f16" style="left:16px;top:63px;">The Midnight Library</div>
-  <div class="text-inv f12" style="left:16px;top:81px;">Between life and death there is a library...</div>
-  <div class="text-inv f12" style="right:16px;top:63px;">14KB</div>
+  <div style="position:absolute;left:32px;top:36px;right:32px;bottom:44px;font-size:18px;line-height:28px;color:#111;">
+    <b>No</b>ra <b>See</b>d <b>ha</b>d <b>dec</b>ided <b>sh</b>e <b>di</b>d <b>no</b>t <b>wa</b>nt <b>t</b>o <b>exi</b>st <b>any</b>more.<br>
+    <b>Sh</b>e <b>ha</b>d <b>dec</b>ided <b>thi</b>s <b>o</b>n <b>a</b> <b>Tue</b>sday — <b>mid</b>night <b>bet</b>ween<br>
+    <b>Mon</b>day <b>an</b>d <b>Wed</b>nesday — <b>bec</b>ause <b>Tue</b>sdays <b>alw</b>ays<br>
+    <b>fel</b>t <b>lik</b>e <b>th</b>e <b>mo</b>st <b>mea</b>ningless <b>da</b>y. <b>Sh</b>e <b>wro</b>te <b>a</b><br>
+    <b>sui</b>cide <b>no</b>te <b>an</b>d <b>too</b>k <b>a</b> <b>let</b>hal <b>do</b>se <b>o</b>f <b>slee</b>ping<br>
+    <b>pil</b>ls <b>an</b>d <b>wai</b>ted <b>fo</b>r <b>eve</b>rything <b>t</b>o <b>en</b>d.<br><br>
+    <b>I</b>t <b>did</b>n't.<br><br>
+    <b>Ins</b>tead <b>sh</b>e <b>fou</b>nd <b>her</b>self <b>i</b>n <b>a</b> <b>lib</b>rary.
+  </div>
 
-  <!-- divider -->
-  <div class="hline" style="top:95px;background:#555;"></div>
-
-  <!-- row 1 -->
-  <div class="text bold f16" style="left:16px;top:118px;">Shopping list</div>
-  <div class="text f12" style="left:16px;top:136px;">milk eggs bread coffee oat...</div>
-  <div class="text f12" style="right:16px;top:118px;">512B</div>
-  <div class="hline" style="top:151px;"></div>
-
-  <!-- row 2 -->
-  <div class="text bold f16" style="left:16px;top:173px;">Book ideas</div>
-  <div class="text f12" style="left:16px;top:191px;">1. Neuromancer  2. Snow Crash  3. Blindsight...</div>
-  <div class="text f12" style="right:16px;top:173px;">1KB</div>
-  <div class="hline" style="top:208px;"></div>
-
-  <!-- row 3 -->
-  <div class="text bold f16" style="left:16px;top:229px;">Meeting notes 2026-05-12</div>
-  <div class="text f12" style="left:16px;top:247px;">Q2 roadmap discussion. Action items: ...</div>
-  <div class="text f12" style="right:16px;top:229px;">3KB</div>
-  <div class="hline" style="top:265px;"></div>
-
-  <!-- empty space -->
-
-  <!-- footer -->
-  <div class="hline" style="top:438px;"></div>
-  <div class="text f9" style="left:16px;top:452px;">UP/DN: scroll   SEL: open   MENU: new note   SEL long: delete</div>
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:467px;">L/R: page   SEL long: dictionary   BACK: menu</span>
+  <span class="text f9" style="right:16px;top:467px;">Bionic: ON</span>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>4 — Note Editor (soft keyboard)</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 4 — Note Editor (soft keyboard)
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>4 — Note Editor</h2>
 <div class="screen">
-  <!-- status bar -->
-  <div class="bar" style="top:0;height:20px;"></div>
-  <div class="text-inv f9" style="left:8px;top:14px;">The Midnight Library.txt</div>
-  <div class="text-inv f9" style="right:8px;top:14px;">●  unsaved</div>
+  <div style="position:absolute;top:0;left:0;right:0;height:20px;background:#111;"></div>
+  <span class="texti f9" style="left:8px;top:14px;">shopping-list.txt</span>
+  <span class="texti f9" style="right:8px;top:14px;">● unsaved</span>
 
-  <!-- text area -->
-  <div class="text f16" style="left:8px;top:40px;">Between life and death there is a library,</div>
-  <div class="text f16" style="left:8px;top:62px;">and within that library, the shelves go on</div>
-  <div class="text f16" style="left:8px;top:84px;">forever. Every book provides a chance to try</div>
-  <div class="text f16" style="left:8px;top:106px;">another life you could have lived. To see how</div>
-  <div class="text f16" style="left:8px;top:128px;">things would be if you had made other choices<span style="background:#111;color:#f5f0e8;"> </span></div>
+  <div style="position:absolute;left:8px;top:28px;font-size:18px;line-height:26px;color:#111;">
+    milk<br>eggs<br>bread<br>coffee<br>oat milk<span style="background:#111;color:#f4f0e6;"> </span>
+  </div>
 
-  <!-- keyboard area -->
-  <div class="hline" style="top:360px;"></div>
+  <div class="hline" style="top:355px;"></div>
 
-  <!-- row 0: numbers -->
   <style>
-    .key {
-      position:absolute;
-      width:34px; height:26px;
-      border:1px solid #555;
-      background:#f5f0e8;
-      text-align:center;
-      line-height:26px;
-      font-size:13px;
-      color:#111;
-      border-radius:2px;
-    }
-    .key.active { background:#111; color:#f5f0e8; }
-    .key.wide { width:60px; }
-    .key.xwide { width:120px; }
+    .key{position:absolute;width:33px;height:25px;border:1px solid #666;background:#f4f0e6;
+         text-align:center;line-height:25px;font-size:12px;color:#111;border-radius:2px;}
+    .key.on{background:#111;color:#f4f0e6;}
+    .key.w2{width:58px;}
+    .key.w3{width:110px;}
   </style>
+  <!-- row 0 numbers -->
+  <div class="key" style="left:4px;top:358px;">1</div><div class="key" style="left:39px;top:358px;">2</div>
+  <div class="key" style="left:74px;top:358px;">3</div><div class="key" style="left:109px;top:358px;">4</div>
+  <div class="key" style="left:144px;top:358px;">5</div><div class="key" style="left:179px;top:358px;">6</div>
+  <div class="key" style="left:214px;top:358px;">7</div><div class="key" style="left:249px;top:358px;">8</div>
+  <div class="key" style="left:284px;top:358px;">9</div><div class="key" style="left:319px;top:358px;">0</div>
+  <div class="key" style="left:354px;top:358px;">-</div><div class="key" style="left:389px;top:358px;">=</div>
+  <!-- row 1 QWERTY -->
+  <div class="key" style="left:4px;top:385px;">Q</div><div class="key" style="left:39px;top:385px;">W</div>
+  <div class="key" style="left:74px;top:385px;">E</div><div class="key" style="left:109px;top:385px;">R</div>
+  <div class="key" style="left:144px;top:385px;">T</div><div class="key" style="left:179px;top:385px;">Y</div>
+  <div class="key" style="left:214px;top:385px;">U</div><div class="key" style="left:249px;top:385px;">I</div>
+  <div class="key" style="left:284px;top:385px;">O</div><div class="key" style="left:319px;top:385px;">P</div>
+  <!-- row 2 ASDF (O selected) -->
+  <div class="key" style="left:4px;top:412px;">A</div><div class="key" style="left:39px;top:412px;">S</div>
+  <div class="key" style="left:74px;top:412px;">D</div><div class="key" style="left:109px;top:412px;">F</div>
+  <div class="key" style="left:144px;top:412px;">G</div><div class="key" style="left:179px;top:412px;">H</div>
+  <div class="key" style="left:214px;top:412px;">J</div><div class="key" style="left:249px;top:412px;">K</div>
+  <div class="key on" style="left:284px;top:412px;">L</div>
+  <!-- row 3 ZXCVBNM + specials -->
+  <div class="key" style="left:4px;top:439px;">Z</div><div class="key" style="left:39px;top:439px;">X</div>
+  <div class="key" style="left:74px;top:439px;">C</div><div class="key" style="left:109px;top:439px;">V</div>
+  <div class="key" style="left:144px;top:439px;">B</div><div class="key" style="left:179px;top:439px;">N</div>
+  <div class="key" style="left:214px;top:439px;">M</div>
+  <div class="key w2" style="left:249px;top:439px;">BKSP</div>
+  <div class="key w3" style="left:309px;top:439px;">SPACE</div>
 
-  <!-- row 0 numbers: 1234567890-= -->
-  <div class="key" style="left:4px;top:363px;">1</div>
-  <div class="key" style="left:40px;top:363px;">2</div>
-  <div class="key" style="left:76px;top:363px;">3</div>
-  <div class="key" style="left:112px;top:363px;">4</div>
-  <div class="key" style="left:148px;top:363px;">5</div>
-  <div class="key" style="left:184px;top:363px;">6</div>
-  <div class="key" style="left:220px;top:363px;">7</div>
-  <div class="key" style="left:256px;top:363px;">8</div>
-  <div class="key" style="left:292px;top:363px;">9</div>
-  <div class="key" style="left:328px;top:363px;">0</div>
-  <div class="key" style="left:364px;top:363px;">-</div>
-  <div class="key" style="left:400px;top:363px;">=</div>
-
-  <!-- row 1: QWERTYUIOP -->
-  <div class="key" style="left:4px;top:392px;">Q</div>
-  <div class="key" style="left:40px;top:392px;">W</div>
-  <div class="key" style="left:76px;top:392px;">E</div>
-  <div class="key" style="left:112px;top:392px;">R</div>
-  <div class="key" style="left:148px;top:392px;">T</div>
-  <div class="key" style="left:184px;top:392px;">Y</div>
-  <div class="key" style="left:220px;top:392px;">U</div>
-  <div class="key" style="left:256px;top:392px;">I</div>
-  <div class="key" style="left:292px;top:392px;">O</div>
-  <div class="key" style="left:328px;top:392px;">P</div>
-
-  <!-- row 2: ASDFGHJKL (selected on S) -->
-  <div class="key" style="left:4px;top:421px;">A</div>
-  <div class="key active" style="left:40px;top:421px;">S</div>
-  <div class="key" style="left:76px;top:421px;">D</div>
-  <div class="key" style="left:112px;top:421px;">F</div>
-  <div class="key" style="left:148px;top:421px;">G</div>
-  <div class="key" style="left:184px;top:421px;">H</div>
-  <div class="key" style="left:220px;top:421px;">J</div>
-  <div class="key" style="left:256px;top:421px;">K</div>
-  <div class="key" style="left:292px;top:421px;">L</div>
-
-  <!-- row 3: ZXCVBNM + BKSP + SPC -->
-  <div class="key" style="left:4px;top:450px;">Z</div>
-  <div class="key" style="left:40px;top:450px;">X</div>
-  <div class="key" style="left:76px;top:450px;">C</div>
-  <div class="key" style="left:112px;top:450px;">V</div>
-  <div class="key" style="left:148px;top:450px;">B</div>
-  <div class="key" style="left:184px;top:450px;">N</div>
-  <div class="key" style="left:220px;top:450px;">M</div>
-  <div class="key wide" style="left:256px;top:450px;">BKSP</div>
-  <div class="key xwide" style="left:318px;top:450px;">SPACE</div>
-
-  <!-- hint on right of keyboard -->
-  <div class="text f9" style="left:450px;top:370px;">UP/DN: row</div>
-  <div class="text f9" style="left:450px;top:384px;">SEL: type key</div>
-  <div class="text f9" style="left:450px;top:398px;">BACK: menu</div>
+  <span class="text f9" style="left:440px;top:363px;">UP/DN: row   SEL: type   BACK: menu</span>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>5 — Reader (bionic reading mode)</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 5 — Reading Stats
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>5 — Reading Stats</h2>
 <div class="screen">
-  <!-- status bar -->
-  <div class="bar" style="top:0;height:24px;"></div>
-  <div class="text-inv f12" style="left:16px;top:18px;">The Midnight Library</div>
-  <div class="text-inv f12" style="right:16px;top:18px;">p. 42 / 310</div>
+  <div style="position:absolute;top:0;left:0;right:0;height:30px;background:#111;"></div>
+  <span class="texti bold f16" style="left:8px;top:22px;">Reading Stats</span>
 
-  <!-- page text — bionic: bold prefix, normal suffix -->
-  <div style="position:absolute;left:32px;top:44px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">Nora</span> Seed had <span class="bold">de</span>cided she <span class="bold">did</span> not <span class="bold">wa</span>nt to <span class="bold">ex</span>ist an<span class="bold">y</span>more.
-  </div>
-  <div style="position:absolute;left:32px;top:76px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">She</span> had <span class="bold">dec</span>ided this on a <span class="bold">Tues</span>day — <span class="bold">mid</span>night <span class="bold">be</span>tween
-  </div>
-  <div style="position:absolute;left:32px;top:108px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">Mon</span>day and <span class="bold">Wed</span>nesday — <span class="bold">be</span>cause <span class="bold">Tues</span>days <span class="bold">al</span>ways
-  </div>
-  <div style="position:absolute;left:32px;top:140px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">felt</span> like <span class="bold">the</span> <span class="bold">mo</span>st <span class="bold">mean</span>ingless <span class="bold">da</span>y. <span class="bold">She</span> <span class="bold">wro</span>te a
-  </div>
-  <div style="position:absolute;left:32px;top:172px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">sui</span>cide <span class="bold">no</span>te and <span class="bold">took</span> a <span class="bold">let</span>hal <span class="bold">do</span>se of <span class="bold">sleep</span>ing
-  </div>
-  <div style="position:absolute;left:32px;top:204px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">pi</span>lls and <span class="bold">wa</span>ited for <span class="bold">eve</span>rything to <span class="bold">en</span>d.
-  </div>
-  <div style="position:absolute;left:32px;top:260px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">It</span> <span class="bold">did</span>n't.
-  </div>
-  <div style="position:absolute;left:32px;top:310px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">In</span>stead she <span class="bold">fou</span>nd <span class="bold">her</span>self <span class="bold">in</span> a <span class="bold">li</span>brary, <span class="bold">fa</span>cing
-  </div>
-  <div style="position:absolute;left:32px;top:342px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">Mrs</span>. El<span class="bold">m</span>, her <span class="bold">old</span> school <span class="bold">lib</span>rarian, <span class="bold">who</span> <span class="bold">ex</span>plained
-  </div>
-  <div style="position:absolute;left:32px;top:374px;font-size:19px;line-height:30px;color:#111;">
-    <span class="bold">that</span> she <span class="bold">coul</span>d <span class="bold">li</span>ve <span class="bold">an</span>y <span class="bold">li</span>fe she <span class="bold">mi</span>ght <span class="bold">ha</span>ve <span class="bold">li</span>ved.
-  </div>
+  <span class="text bold f16" style="left:16px;top:55px;">Today</span>
+  <span class="text f16" style="left:16px;top:76px;">1h 24m — 62 pages</span>
+  <div class="hline" style="top:100px;"></div>
 
-  <!-- footer -->
-  <div class="hline" style="top:438px;"></div>
-  <div class="text f9" style="left:16px;top:452px;">LEFT/RIGHT: page   SEL long: dictionary   BACK: menu</div>
-  <!-- bionic mode indicator -->
-  <div class="text f9" style="right:16px;top:452px;">Bionic: ON</div>
-</div>
+  <span class="text bold f16" style="left:16px;top:116px;">Streak</span>
+  <span class="text f16" style="left:16px;top:137px;">7 days</span>
+  <div class="hline" style="top:160px;"></div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>6 — Reading Stats</h2>
-<div class="screen">
-  <!-- header -->
-  <div class="bar" style="top:0;height:30px;"></div>
-  <div class="text-inv bold f16" style="left:8px;top:22px;">Reading Stats</div>
+  <span class="text bold f16" style="left:16px;top:176px;">Daily Goal (30 min)</span>
+  <div style="position:absolute;left:16px;top:202px;width:600px;height:18px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:16px;top:202px;width:420px;height:18px;background:#111;"></div>
+  <span class="text f12" style="left:624px;top:216px;">70%</span>
+  <div class="hline" style="top:234px;"></div>
 
-  <!-- today -->
-  <div class="text bold f16" style="left:16px;top:56px;">Today</div>
-  <div class="text f16" style="left:16px;top:78px;">1h 24m  —  62 pages</div>
-  <div class="hline" style="top:104px;"></div>
+  <span class="text bold f16" style="left:16px;top:250px;">Last 30 days</span>
 
-  <!-- streak -->
-  <div class="text bold f16" style="left:16px;top:120px;">Streak</div>
-  <div class="text f16" style="left:16px;top:142px;">🔥 7 days</div>
-  <div class="hline" style="top:168px;"></div>
-
-  <!-- daily goal -->
-  <div class="text bold f16" style="left:16px;top:184px;">Daily Goal  (30 min)</div>
-  <!-- progress bar -->
-  <div class="rect" style="left:16px;top:212px;width:600px;height:20px;"></div>
-  <div class="fill" style="left:16px;top:212px;width:420px;height:20px;"></div>
-  <div class="text f12" style="left:630px;top:228px;">70%</div>
-  <div class="hline" style="top:244px;"></div>
-
-  <!-- heatmap label -->
-  <div class="text bold f16" style="left:16px;top:260px;">Last 30 days</div>
-
-  <!-- heatmap grid: 30 cells -->
   <style>
-    .hcell { position:absolute; width:20px; height:20px; border:1px solid #bbb; }
-    .hc0 { background:#f5f0e8; }
-    .hc1 { background:#bbb; }
-    .hc2 { background:#777; }
-    .hc3 { background:#333; }
-    .hc4 { background:#111; }
+    .hc{position:absolute;width:18px;height:18px;border:1px solid #bbb;}
+    .d0{background:#f4f0e6;}.d1{background:#ccc;}.d2{background:#888;}.d3{background:#444;}.d4{background:#111;}
   </style>
-  <!-- 6 rows of 5 = 30 days, rough approximation -->
-  <div class="hcell hc2" style="left:16px;top:284px;"></div>
-  <div class="hcell hc3" style="left:38px;top:284px;"></div>
-  <div class="hcell hc4" style="left:60px;top:284px;"></div>
-  <div class="hcell hc1" style="left:82px;top:284px;"></div>
-  <div class="hcell hc3" style="left:104px;top:284px;"></div>
-  <div class="hcell hc4" style="left:126px;top:284px;"></div>
-  <div class="hcell hc0" style="left:148px;top:284px;"></div>
-  <div class="hcell hc2" style="left:170px;top:284px;"></div>
-  <div class="hcell hc3" style="left:192px;top:284px;"></div>
-  <div class="hcell hc4" style="left:214px;top:284px;"></div>
+  <!-- 3 rows × 10 cols of heatmap cells -->
+  <div class="hc d2" style="left:16px;top:273px;"></div><div class="hc d3" style="left:36px;top:273px;"></div>
+  <div class="hc d4" style="left:56px;top:273px;"></div><div class="hc d1" style="left:76px;top:273px;"></div>
+  <div class="hc d3" style="left:96px;top:273px;"></div><div class="hc d4" style="left:116px;top:273px;"></div>
+  <div class="hc d0" style="left:136px;top:273px;"></div><div class="hc d2" style="left:156px;top:273px;"></div>
+  <div class="hc d3" style="left:176px;top:273px;"></div><div class="hc d4" style="left:196px;top:273px;"></div>
 
-  <div class="hcell hc1" style="left:16px;top:306px;"></div>
-  <div class="hcell hc0" style="left:38px;top:306px;"></div>
-  <div class="hcell hc2" style="left:60px;top:306px;"></div>
-  <div class="hcell hc4" style="left:82px;top:306px;"></div>
-  <div class="hcell hc4" style="left:104px;top:306px;"></div>
-  <div class="hcell hc3" style="left:126px;top:306px;"></div>
-  <div class="hcell hc2" style="left:148px;top:306px;"></div>
-  <div class="hcell hc1" style="left:170px;top:306px;"></div>
-  <div class="hcell hc3" style="left:192px;top:306px;"></div>
-  <div class="hcell hc4" style="left:214px;top:306px;"></div>
+  <div class="hc d1" style="left:16px;top:293px;"></div><div class="hc d0" style="left:36px;top:293px;"></div>
+  <div class="hc d2" style="left:56px;top:293px;"></div><div class="hc d4" style="left:76px;top:293px;"></div>
+  <div class="hc d4" style="left:96px;top:293px;"></div><div class="hc d3" style="left:116px;top:293px;"></div>
+  <div class="hc d2" style="left:136px;top:293px;"></div><div class="hc d1" style="left:156px;top:293px;"></div>
+  <div class="hc d3" style="left:176px;top:293px;"></div><div class="hc d4" style="left:196px;top:293px;"></div>
 
-  <div class="hcell hc2" style="left:16px;top:328px;"></div>
-  <div class="hcell hc3" style="left:38px;top:328px;"></div>
-  <div class="hcell hc1" style="left:60px;top:328px;"></div>
-  <div class="hcell hc0" style="left:82px;top:328px;"></div>
-  <div class="hcell hc4" style="left:104px;top:328px;"></div>
-  <div class="hcell hc3" style="left:126px;top:328px;"></div>
-  <div class="hcell hc2" style="left:148px;top:328px;"></div>
-  <div class="hcell hc4" style="left:170px;top:328px;"></div>
-  <div class="hcell hc4" style="left:192px;top:328px;"></div>
-  <div class="hcell hc3" style="left:214px;top:328px;"></div>
+  <div class="hc d2" style="left:16px;top:313px;"></div><div class="hc d3" style="left:36px;top:313px;"></div>
+  <div class="hc d1" style="left:56px;top:313px;"></div><div class="hc d0" style="left:76px;top:313px;"></div>
+  <div class="hc d4" style="left:96px;top:313px;"></div><div class="hc d3" style="left:116px;top:313px;"></div>
+  <div class="hc d2" style="left:136px;top:313px;"></div><div class="hc d4" style="left:156px;top:313px;"></div>
+  <div class="hc d4" style="left:176px;top:313px;"></div><div class="hc d3" style="left:196px;top:313px;"></div>
 
-  <!-- legend -->
-  <div class="text f9" style="left:16px;top:362px;">less</div>
-  <div class="hcell hc0" style="left:50px;top:358px;width:14px;height:14px;"></div>
-  <div class="hcell hc1" style="left:66px;top:358px;width:14px;height:14px;"></div>
-  <div class="hcell hc2" style="left:82px;top:358px;width:14px;height:14px;"></div>
-  <div class="hcell hc3" style="left:98px;top:358px;width:14px;height:14px;"></div>
-  <div class="hcell hc4" style="left:114px;top:358px;width:14px;height:14px;"></div>
-  <div class="text f9" style="left:132px;top:362px;">more</div>
+  <span class="text f9" style="left:16px;top:348px;">less</span>
+  <div class="hc d0" style="left:46px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d1" style="left:61px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d2" style="left:76px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d3" style="left:91px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d4" style="left:106px;top:345px;width:13px;height:13px;"></div>
+  <span class="text f9" style="left:122px;top:348px;">more</span>
 
-  <!-- footer -->
-  <div class="hline" style="top:438px;"></div>
-  <div class="text f9" style="left:16px;top:452px;">BACK: return home</div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════ -->
-<h2>7 — Delete Note Confirmation</h2>
-<div class="screen">
-  <!-- dimmed bg suggestion -->
-  <div style="position:absolute;inset:0;background:rgba(200,195,185,0.5);"></div>
-  <!-- dialog box -->
-  <div style="position:absolute;left:40px;top:80px;width:720px;height:140px;background:#f5f0e8;border:2px solid #111;">
-    <div class="text bold f16" style="left:52px;top:102px;">Delete note?</div>
-    <div class="text f12" style="left:52px;top:124px;">The Midnight Library.txt</div>
-    <div class="hline" style="top:134px;left:40px;right:0;"></div>
-    <!-- YES (selected) -->
-    <div class="fill" style="left:60px;top:150px;width:80px;height:36px;"></div>
-    <div class="text-inv bold f16" style="left:78px;top:174px;">YES</div>
-    <!-- NO -->
-    <div class="rect" style="left:160px;top:150px;width:80px;height:36px;"></div>
-    <div class="text bold f16" style="left:181px;top:174px;">NO</div>
-    <!-- hint -->
-    <div class="text f9" style="left:52px;top:204px;">UP/DN: choose   SEL: confirm   BACK: cancel</div>
-  </div>
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:467px;">BACK: return home</span>
 </div>
 
 </body>

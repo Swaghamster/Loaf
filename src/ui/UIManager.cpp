@@ -4,16 +4,19 @@
 #include "../../include/config.h"
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Home menu layout
+// Home menu — iPod-style horizontal carousel
 //
-// 5 items arranged in a single row centred on the display.
-// Each icon is a labelled box drawn inside the content area.
+// The selected item sits large at the centre; two flanking items appear at
+// reduced size on either side, and partial "ghost" items peek in from the
+// edges to indicate there is more to scroll through.
 //
-//   [Library] [Notes] [Stats] [Dict] [Settings]
+// Navigation: LEFT / RIGHT (or UP / DOWN) spin the carousel.
+//
+//   ghost  |  prev  |  [SELECTED]  |  next  |  ghost
+//    50px     130px      200px        130px     50px
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Menu item descriptors
 struct MenuItem {
     const char* label;
     Screen      screen;
@@ -61,18 +64,34 @@ void UIManager::init() {
 void UIManager::handleButton(uint8_t btn, bool longPress) {
     switch (_current) {
 
-        // ── Home screen ──────────────────────────────────────────────────────
+        // ── Home screen — two zones ──────────────────────────────────────────
+        // Zone 0: book carousel (LEFT/RIGHT navigate books, SELECT opens book)
+        // Zone 1: app strip    (LEFT/RIGHT navigate apps,  SELECT enters app)
+        // UP/DOWN switches between zones.
         case Screen::SCREEN_HOME:
-            if (btn == BTN_UP) {
-                _menuIndex = (_menuIndex - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
+            if (btn == BTN_UP || btn == BTN_DOWN) {
+                _homeZone = (_homeZone == 0) ? 1 : 0;
                 _dirty = true;
-            } else if (btn == BTN_DOWN) {
-                _menuIndex = (_menuIndex + 1) % MENU_ITEM_COUNT;
+            } else if (btn == BTN_LEFT) {
+                if (_homeZone == 0 && _recentCount > 0) {
+                    _bookIndex = (_bookIndex - 1 + _recentCount) % _recentCount;
+                } else {
+                    _menuIndex = (_menuIndex - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
+                }
+                _dirty = true;
+            } else if (btn == BTN_RIGHT) {
+                if (_homeZone == 0 && _recentCount > 0) {
+                    _bookIndex = (_bookIndex + 1) % _recentCount;
+                } else {
+                    _menuIndex = (_menuIndex + 1) % MENU_ITEM_COUNT;
+                }
                 _dirty = true;
             } else if (btn == BTN_SELECT) {
-                navigateTo(kMenuItems[_menuIndex].screen);
+                if (_homeZone == 1) {
+                    navigateTo(kMenuItems[_menuIndex].screen);
+                }
+                // Zone 0 (book) open: handled by reader subsystem in future
             }
-            // Long press on SELECT from home → do nothing special
             break;
 
         // ── Library ──────────────────────────────────────────────────────────
@@ -218,108 +237,272 @@ void UIManager::drawStatusBar() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// drawMenuIcon
-//
-// Draws a single home-menu icon at centre position (cx, cy).
-// The icon is a box with an internal decorative symbol, plus a text label
-// drawn below. When selected=true the box is filled black (inverted).
+// recordRecentBook — prepend a book to the recent list (newest-first)
 // ─────────────────────────────────────────────────────────────────────────────
-void UIManager::drawMenuIcon(int16_t cx, int16_t cy,
-                             int iconIndex,
-                             const char* label,
-                             bool selected) {
-    EPDDisplay& epd = EPDDisplay::instance();
+void UIManager::recordRecentBook(const String& title, const String& filename,
+                                 int currentPage, int totalPages) {
+    // Remove existing entry for same file if present
+    int dest = 0;
+    for (int i = 0; i < _recentCount; ++i) {
+        if (_recentBooks[i].filename != filename) {
+            _recentBooks[dest++] = _recentBooks[i];
+        }
+    }
+    _recentCount = dest;
 
-    const int16_t half  = ICON_SIZE / 2;
-    const int16_t x     = cx - half;
-    const int16_t y     = cy - half;
+    // Shift everything down one slot to make room at index 0
+    int newCount = min(_recentCount + 1, RECENT_BOOKS_MAX);
+    for (int i = newCount - 1; i > 0; --i) {
+        _recentBooks[i] = _recentBooks[i - 1];
+    }
+    _recentBooks[0].title       = title;
+    _recentBooks[0].filename    = filename;
+    _recentBooks[0].currentPage = currentPage;
+    _recentBooks[0].totalPages  = totalPages;
+    _recentCount = newCount;
+
+    // Keep carousel index in range
+    if (_bookIndex >= _recentCount) _bookIndex = 0;
+    _dirty = true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _drawBookCard  — portrait-shaped book card centred at (cx, cy)
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::_drawBookCard(int16_t cx, int16_t cy,
+                              int16_t w, int16_t h,
+                              const char* title,
+                              int page, int total,
+                              bool selected) {
+    EPDDisplay& epd = EPDDisplay::instance();
+    int16_t x = cx - w / 2;
+    int16_t y = cy - h / 2;
 
     if (selected) {
-        // Filled black box for selected state
-        epd.fillRect(x, y, ICON_SIZE, ICON_SIZE, 0x0000);
+        epd.fillRect(x, y, w, h, 0x0000);
+        // Horizontal "page lines" in white
+        for (int r = 0; r < 4; ++r) {
+            int16_t ly = y + h / 5 + r * (h / 6);
+            int16_t lw = (int16_t)(w * 7 / 10);
+            epd.drawLine(x + w / 8, ly, x + w / 8 + lw, ly, 0xFFFF);
+        }
+        if (title && *title) {
+            uint8_t fsz = (w >= BOOK_SEL_W) ? 12 : 9;
+            // Clip title to fit
+            String t(title);
+            while (t.length() > 1 &&
+                   epd.getTextWidth(t.c_str(), fsz, true) > w - 8) {
+                t = t.substring(0, t.length() - 1);
+            }
+            int16_t tw = epd.getTextWidth(t.c_str(), fsz, true);
+            epd.drawText(cx - tw / 2, y + h + fsz + 4,
+                         t.c_str(), fsz, true, 0x0000);
+        }
+        // Progress bar below title
+        if (total > 0 && w >= BOOK_SEL_W) {
+            int16_t barY = y + h + 22;
+            int16_t barW = w;
+            epd.drawRect(cx - barW / 2, barY, barW, 5, 0x0000);
+            int16_t fill = (int16_t)((int32_t)barW * page / total);
+            if (fill > 0) epd.fillRect(cx - barW / 2, barY, fill, 5, 0x0000);
+        }
     } else {
-        epd.fillRect(x, y, ICON_SIZE, ICON_SIZE, 0xFFFF);
-        epd.drawRect(x, y, ICON_SIZE, ICON_SIZE, 0x0000);
+        epd.fillRect(x, y, w, h, 0xFFFF);
+        epd.drawRect(x, y, w, h, 0x0000);
+        if (w >= BOOK_ADJ_W) {
+            epd.drawRect(x + 2, y + 2, w - 4, h - 4, 0x0000);
+            // Faint lines
+            for (int r = 0; r < 3; ++r) {
+                int16_t ly = y + h / 5 + r * (h / 5);
+                epd.drawLine(x + 6, ly, x + w - 6, ly, 0x0000);
+            }
+            if (title && *title) {
+                String t(title);
+                while (t.length() > 1 &&
+                       epd.getTextWidth(t.c_str(), 9, false) > w - 4) {
+                    t = t.substring(0, t.length() - 1);
+                }
+                int16_t tw = epd.getTextWidth(t.c_str(), 9, false);
+                epd.drawText(cx - tw / 2, y + h + 12,
+                             t.c_str(), 9, false, 0x0000);
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _drawAppIcon — small square icon for the app strip
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::_drawAppIcon(int16_t cx, int16_t cy, int idx, bool selected) {
+    EPDDisplay& epd = EPDDisplay::instance();
+    int16_t half = APP_ICON_SZ / 2;
+    int16_t x = cx - half, y = cy - half;
+    int16_t s = APP_ICON_SZ;
+
+    if (selected) {
+        epd.fillRect(x, y, s, s, 0x0000);
+    } else {
+        epd.fillRect(x, y, s, s, 0xFFFF);
+        epd.drawRect(x, y, s, s, 0x0000);
+        epd.drawRect(x+2, y+2, s-4, s-4, 0x0000);
+    }
+    uint16_t fg = selected ? 0xFFFF : 0x0000;
+    int16_t p = s / 6, in = s - p * 2, ix = x + p, iy = y + p;
+
+    switch (idx) {
+        case 0: // Library: 3 lines
+            for (int r=0;r<3;++r) epd.drawLine(ix, iy+in/4+r*in/4, ix+in, iy+in/4+r*in/4, fg);
+            break;
+        case 1: // Notes: lined page
+            epd.drawRect(ix, iy, in, in, fg);
+            for (int r=0;r<3;++r) epd.drawLine(ix+3, iy+in/5+r*in/4, ix+in-3, iy+in/5+r*in/4, fg);
+            break;
+        case 2: // Stats: 3 bars
+            epd.fillRect(cx-in/3-2, iy+in/2, in/4, in/2, fg);
+            epd.fillRect(cx-in/8,   iy+in/3, in/4, in*2/3, fg);
+            epd.fillRect(cx+in/4+2, iy+in/5, in/4, in*4/5, fg);
+            break;
+        case 3: // Dict: open book
+            epd.drawLine(cx, iy, cx, iy+in, fg);
+            epd.drawLine(ix, iy+2, cx, iy, fg);
+            epd.drawLine(ix, iy+in, cx, iy+in, fg);
+            epd.drawLine(cx, iy, ix+in, iy+2, fg);
+            epd.drawLine(cx, iy+in, ix+in, iy+in, fg);
+            break;
+        case 4: // Settings: gear
+            epd.drawRect(cx-in/4, cy-in/4, in/2, in/2, fg);
+            epd.drawLine(cx, iy,        cx, iy+in/5,    fg);
+            epd.drawLine(cx, iy+in*4/5, cx, iy+in,      fg);
+            epd.drawLine(ix, cy,        ix+in/5, cy,     fg);
+            epd.drawLine(ix+in*4/5, cy, ix+in, cy,       fg);
+            break;
+        default: break;
     }
 
-    uint16_t fgColor = selected ? 0xFFFF : 0x0000;
+    // Label below
+    const char* label = kMenuItems[idx].label;
+    int16_t lw = epd.getTextWidth(label, 9, selected);
+    epd.drawText(cx - lw/2, y + s + 13, label, 9, selected, 0x0000);
 
-    // Draw a simple distinguishing symbol inside the box based on iconIndex
-    switch (iconIndex) {
-        case 0: // Library — three horizontal lines (book icon)
-            for (int row = 0; row < 3; ++row) {
-                int16_t ly = y + 10 + row * 8;
-                epd.drawLine(x + 8, ly, x + ICON_SIZE - 8, ly, fgColor);
-            }
-            break;
-        case 1: // Notes — lined page icon
-            epd.drawRect(x + 8, y + 6, ICON_SIZE - 16, ICON_SIZE - 12, fgColor);
-            for (int row = 0; row < 3; ++row) {
-                int16_t ly = y + 13 + row * 7;
-                epd.drawLine(x + 12, ly, x + ICON_SIZE - 12, ly, fgColor);
-            }
-            break;
-        case 2: // Stats — bar chart
-            epd.fillRect(x + 8,  y + 22, 6, 12, fgColor);
-            epd.fillRect(x + 17, y + 16, 6, 18, fgColor);
-            epd.fillRect(x + 26, y + 10, 6, 24, fgColor);
-            break;
-        case 3: // Dict — capital D outline
-            epd.drawRect(x + 10, y + 8, 14, 24, fgColor);
-            epd.drawLine(x + 10, y + 8,  x + 18, y + 8,  fgColor);
-            epd.drawLine(x + 10, y + 32, x + 18, y + 32, fgColor);
-            epd.drawLine(x + 24, y + 14, x + 24, y + 26, fgColor);
-            break;
-        case 4: // Settings — cogwheel approximation (circle + dots)
-            epd.drawRect(x + 12, y + 12, 16, 16, fgColor);
-            // Cardinal notch lines
-            epd.drawLine(cx, y + 6,  cx, y + 10, fgColor);
-            epd.drawLine(cx, y + 30, cx, y + 34, fgColor);
-            epd.drawLine(x + 6,  cy, x + 10, cy, fgColor);
-            epd.drawLine(x + 30, cy, x + 34, cy, fgColor);
-            break;
-        default:
-            // Generic: just the box, no symbol
-            break;
+    // Underline for selected item
+    if (selected) {
+        epd.drawLine(x, y + s + 15, x + s, y + s + 15, 0x0000);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _drawBookCarousel — top zone of home screen
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::_drawBookCarousel() {
+    EPDDisplay& epd = EPDDisplay::instance();
+
+    const int16_t zoneTop = CONTENT_Y;
+    const int16_t zoneH   = ZONE_DIV_Y - zoneTop;
+    const int16_t cx      = EPD_WIDTH / 2;
+    const int16_t cy      = zoneTop + zoneH / 2 - 10;
+
+    // Zone focus indicator: bold label when this zone is active
+    uint16_t labelColor = (_homeZone == 0) ? 0x0000 : 0x0000;
+    bool labelBold = (_homeZone == 0);
+    epd.drawText(MARGIN_X, zoneTop + 14, "Recently Read", 12, labelBold, labelColor);
+    // Focus underline
+    if (_homeZone == 0) {
+        epd.drawLine(MARGIN_X, zoneTop + 16,
+                     MARGIN_X + epd.getTextWidth("Recently Read", 12, true) + 2,
+                     zoneTop + 16, 0x0000);
     }
 
-    // Label below the icon
-    int16_t labelW = epd.getTextWidth(label, 12, false);
-    int16_t labelX = cx - labelW / 2;
-    int16_t labelY = y + ICON_SIZE + 14;   // baseline below the box
-    epd.drawText(labelX, labelY, label, 12, false, 0x0000);
+    if (_recentCount == 0) {
+        const char* msg = "No books read yet — go to Library";
+        int16_t mw = epd.getTextWidth(msg, 12, false);
+        epd.drawText(cx - mw/2, cy + 6, msg, 12, false, 0x0000);
+        return;
+    }
+
+    // Horizontal offsets
+    static constexpr int16_t OFF_ADJ   = 175;
+    static constexpr int16_t OFF_GHOST = 310;
+
+    int n = _recentCount;
+
+    // Ghost left
+    if (n > 2) {
+        int gi = (_bookIndex - 2 + n) % n;
+        _drawBookCard(cx - OFF_GHOST, cy, BOOK_GHOST_W, BOOK_GHOST_H,
+                      _recentBooks[gi].title.c_str(), 0, 0, false);
+    }
+    // Adjacent left
+    if (n > 1) {
+        int ai = (_bookIndex - 1 + n) % n;
+        _drawBookCard(cx - OFF_ADJ, cy, BOOK_ADJ_W, BOOK_ADJ_H,
+                      _recentBooks[ai].title.c_str(), 0, 0, false);
+    }
+    // Centre
+    _drawBookCard(cx, cy, BOOK_SEL_W, BOOK_SEL_H,
+                  _recentBooks[_bookIndex].title.c_str(),
+                  _recentBooks[_bookIndex].currentPage,
+                  _recentBooks[_bookIndex].totalPages,
+                  _homeZone == 0);
+    // Adjacent right
+    if (n > 1) {
+        int ai = (_bookIndex + 1) % n;
+        _drawBookCard(cx + OFF_ADJ, cy, BOOK_ADJ_W, BOOK_ADJ_H,
+                      _recentBooks[ai].title.c_str(), 0, 0, false);
+    }
+    // Ghost right
+    if (n > 2) {
+        int gi = (_bookIndex + 2) % n;
+        _drawBookCard(cx + OFF_GHOST, cy, BOOK_GHOST_W, BOOK_GHOST_H,
+                      _recentBooks[gi].title.c_str(), 0, 0, false);
+    }
+
+    // Dot indicators
+    if (n > 1 && n <= RECENT_BOOKS_MAX) {
+        const int16_t dotR   = 3;
+        const int16_t dotGap = 10;
+        int16_t dotsW = (int16_t)(n * dotGap);
+        int16_t dotX  = cx - dotsW / 2 + dotR;
+        int16_t dotY  = ZONE_DIV_Y - 8;
+        for (int i = 0; i < n; ++i) {
+            if (i == _bookIndex && _homeZone == 0) {
+                epd.fillRect(dotX - dotR, dotY - dotR, dotR*2, dotR*2, 0x0000);
+            } else {
+                epd.drawRect(dotX - dotR, dotY - dotR, dotR*2, dotR*2, 0x0000);
+            }
+            dotX += dotGap;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _drawAppStrip — bottom zone of home screen
+// ─────────────────────────────────────────────────────────────────────────────
+void UIManager::_drawAppStrip() {
+    // 5 icons evenly spaced across 800px
+    const int16_t step = EPD_WIDTH / MENU_ITEM_COUNT;
+    const int16_t cy   = ZONE_DIV_Y + (EPD_HEIGHT - ZONE_DIV_Y - 24) / 2;
+
+    for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
+        int16_t cx = (int16_t)(step / 2 + i * step);
+        _drawAppIcon(cx, cy, i, i == _menuIndex && _homeZone == 1);
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // renderHome
-//
-// Draws five icons arranged horizontally, centred vertically in the content
-// area below the status bar.
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::renderHome() {
+    _drawBookCarousel();
+
     EPDDisplay& epd = EPDDisplay::instance();
+    epd.drawLine(0, ZONE_DIV_Y, EPD_WIDTH - 1, ZONE_DIV_Y, 0x0000);
 
-    // Title
-    epd.drawText(4, CONTENT_Y + 16, "Loaf", 20, true, 0x0000);
+    _drawAppStrip();
 
-    // Compute layout:
-    // Total icon strip width = MENU_ITEM_COUNT * ICON_SIZE + (MENU_ITEM_COUNT-1) * ICON_GAP
-    const int16_t totalW = (int16_t)(MENU_ITEM_COUNT * ICON_SIZE
-                                   + (MENU_ITEM_COUNT - 1) * ICON_GAP);
-    const int16_t startX = (EPD_WIDTH - totalW) / 2 + ICON_SIZE / 2;
-
-    // Vertical centre of icons (account for label below)
-    const int16_t iconCY = CONTENT_Y + (EPD_HEIGHT - CONTENT_Y) / 2 - 10;
-
-    for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
-        int16_t cx = startX + (int16_t)i * (ICON_SIZE + ICON_GAP);
-        drawMenuIcon(cx, iconCY, i, kMenuItems[i].label, i == _menuIndex);
-    }
-
-    // Navigation hint at bottom
-    const char* hint = "UP/DOWN select  SELECT enter";
-    int16_t hintW = epd.getTextWidth(hint, 12, false);
-    epd.drawText((EPD_WIDTH - hintW) / 2, EPD_HEIGHT - 5, hint, 12, false, 0x0000);
+    // Hint
+    const char* hint = "L/R: browse   UP/DN: switch zone   SEL: open";
+    int16_t hw = epd.getTextWidth(hint, 9, false);
+    epd.drawText((EPD_WIDTH - hw) / 2, EPD_HEIGHT - 4, hint, 9, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

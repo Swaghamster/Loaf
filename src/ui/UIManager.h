@@ -53,8 +53,14 @@ public:
     // Home menu: which icon is highlighted (0-based)
     int  selectedMenuItem() const { return _menuIndex; }
 
-    // Number of items in the home menu (Library, Notes, Stats, Dict, Settings)
-    static constexpr int MENU_ITEM_COUNT = 5;
+    // Number of items in the app strip (Library, Notes, Stats, Dict, Settings)
+    static constexpr int MENU_ITEM_COUNT    = 5;
+    // Max recent books shown in the top carousel
+    static constexpr int RECENT_BOOKS_MAX   = 10;
+
+    // Called by the reader when a book is opened — updates the recent list.
+    void recordRecentBook(const String& title, const String& filename,
+                          int currentPage, int totalPages);
 
 private:
     UIManager() = default;
@@ -68,34 +74,57 @@ private:
     void renderNotes();
     void renderDict();
 
+    // ── Home sub-renderers ────────────────────────────────────────────────
+    void _drawBookCarousel();   // top zone: recent books
+    void _drawAppStrip();       // bottom zone: app icons
+
     // ── Shared UI widgets ─────────────────────────────────────────────────
-    // Draws the status bar at y=0 (height STATUS_H).
     void drawStatusBar();
 
-    // Draws a single home-menu icon at grid position (col, row).
-    // iconIndex selects the icon character/shape; label is drawn below.
-    void drawMenuIcon(int16_t cx, int16_t cy,
-                      int iconIndex,
-                      const char* label,
-                      bool selected);
+    // Draw one book card centred at (cx, cy).
+    void _drawBookCard(int16_t cx, int16_t cy, int16_t w, int16_t h,
+                       const char* title, int page, int total, bool selected);
+
+    // Draw one app icon centred at (cx, cy).
+    void _drawAppIcon(int16_t cx, int16_t cy, int itemIndex, bool selected);
 
     // ── State ─────────────────────────────────────────────────────────────
-    Screen _current = Screen::SCREEN_HOME;
-
-    // Navigation back-stack (up to 8 deep is plenty)
+    Screen _current   = Screen::SCREEN_HOME;
     std::vector<Screen> _history;
-
-    // Home screen selection
-    int _menuIndex = 0;
-
-    // Whether the current screen needs a full redraw
     bool _dirty = true;
 
-    // Status bar constants
-    static constexpr int16_t STATUS_H   = 20;
-    static constexpr int16_t CONTENT_Y  = STATUS_H + 2;
+    // Home — which zone is focused: 0 = book carousel, 1 = app strip
+    int _homeZone     = 0;
+    // Book carousel selection
+    int _bookIndex    = 0;
+    // App strip selection
+    int _menuIndex    = 0;
 
-    // Icon grid layout
-    static constexpr int16_t ICON_SIZE  = 40;  // box side length
-    static constexpr int16_t ICON_GAP   = 16;  // horizontal gap between icons
+    // Recent books ring buffer (newest at index 0)
+    struct RecentBook {
+        String title;
+        String filename;
+        int    currentPage = 0;
+        int    totalPages  = 0;
+    };
+    RecentBook       _recentBooks[RECENT_BOOKS_MAX];
+    int              _recentCount = 0;
+
+    // Status bar
+    static constexpr int16_t STATUS_H    = 20;
+    static constexpr int16_t CONTENT_Y   = STATUS_H + 2;
+
+    // Home layout zones
+    static constexpr int16_t ZONE_DIV_Y  = 295;   // y of divider between carousel & strip
+
+    // Book carousel card sizes (w × h — portrait book shape)
+    static constexpr int16_t BOOK_SEL_W  = 150;
+    static constexpr int16_t BOOK_SEL_H  = 190;
+    static constexpr int16_t BOOK_ADJ_W  = 100;
+    static constexpr int16_t BOOK_ADJ_H  = 130;
+    static constexpr int16_t BOOK_GHOST_W =  60;
+    static constexpr int16_t BOOK_GHOST_H =  80;
+
+    // App strip icon size
+    static constexpr int16_t APP_ICON_SZ =  50;
 };
