@@ -1,6 +1,7 @@
 #include "UIManager.h"
 #include "../display/EPDDisplay.h"
 #include "../storage/FileManager.h"
+#include "../reader/CoverLoader.h"
 #include "../../include/config.h"
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -267,66 +268,71 @@ void UIManager::recordRecentBook(const String& title, const String& filename,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _drawBookCard  — portrait-shaped book card centred at (cx, cy)
+// _drawBookCard  — portrait book card centred at (cx, cy)
+//
+// Tries to load /books/<bookDir>/cover.bmp via CoverLoader.
+// Falls back to a striped placeholder if no cover file is present.
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::_drawBookCard(int16_t cx, int16_t cy,
                               int16_t w, int16_t h,
-                              const char* title,
+                              const char* bookDir, const char* title,
                               int page, int total,
                               bool selected) {
     EPDDisplay& epd = EPDDisplay::instance();
     int16_t x = cx - w / 2;
     int16_t y = cy - h / 2;
 
-    if (selected) {
-        epd.fillRect(x, y, w, h, 0x0000);
-        // Horizontal "page lines" in white
-        for (int r = 0; r < 4; ++r) {
-            int16_t ly = y + h / 5 + r * (h / 6);
-            int16_t lw = (int16_t)(w * 7 / 10);
-            epd.drawLine(x + w / 8, ly, x + w / 8 + lw, ly, 0xFFFF);
-        }
-        if (title && *title) {
-            uint8_t fsz = (w >= BOOK_SEL_W) ? 12 : 9;
-            // Clip title to fit
-            String t(title);
-            while (t.length() > 1 &&
-                   epd.getTextWidth(t.c_str(), fsz, true) > w - 8) {
-                t = t.substring(0, t.length() - 1);
+    // Try loading cover image (bookDir = bare dir name under /books/).
+    bool hasCover = bookDir && *bookDir &&
+                    CoverLoader::draw(bookDir, x, y, w, h);
+
+    if (!hasCover) {
+        // Placeholder: filled black (selected) or lined spine (unselected)
+        if (selected) {
+            epd.fillRect(x, y, w, h, 0x0000);
+            for (int r = 0; r < 4; ++r) {
+                int16_t ly = y + h / 5 + r * (h / 6);
+                epd.drawLine(x + w/8, ly, x + w - w/8, ly, 0xFFFF);
             }
-            int16_t tw = epd.getTextWidth(t.c_str(), fsz, true);
-            epd.drawText(cx - tw / 2, y + h + fsz + 4,
-                         t.c_str(), fsz, true, 0x0000);
-        }
-        // Progress bar below title
-        if (total > 0 && w >= BOOK_SEL_W) {
-            int16_t barY = y + h + 22;
-            int16_t barW = w;
-            epd.drawRect(cx - barW / 2, barY, barW, 5, 0x0000);
-            int16_t fill = (int16_t)((int32_t)barW * page / total);
-            if (fill > 0) epd.fillRect(cx - barW / 2, barY, fill, 5, 0x0000);
-        }
-    } else {
-        epd.fillRect(x, y, w, h, 0xFFFF);
-        epd.drawRect(x, y, w, h, 0x0000);
-        if (w >= BOOK_ADJ_W) {
-            epd.drawRect(x + 2, y + 2, w - 4, h - 4, 0x0000);
-            // Faint lines
-            for (int r = 0; r < 3; ++r) {
-                int16_t ly = y + h / 5 + r * (h / 5);
-                epd.drawLine(x + 6, ly, x + w - 6, ly, 0x0000);
-            }
-            if (title && *title) {
-                String t(title);
-                while (t.length() > 1 &&
-                       epd.getTextWidth(t.c_str(), 9, false) > w - 4) {
-                    t = t.substring(0, t.length() - 1);
+        } else {
+            epd.fillRect(x, y, w, h, 0xFFFF);
+            epd.drawRect(x, y, w, h, 0x0000);
+            if (w >= BOOK_ADJ_W) {
+                epd.drawRect(x+2, y+2, w-4, h-4, 0x0000);
+                for (int r = 0; r < 3; ++r) {
+                    int16_t ly = y + h/5 + r*(h/5);
+                    epd.drawLine(x+6, ly, x+w-6, ly, 0x0000);
                 }
-                int16_t tw = epd.getTextWidth(t.c_str(), 9, false);
-                epd.drawText(cx - tw / 2, y + h + 12,
-                             t.c_str(), 9, false, 0x0000);
             }
         }
+    }
+
+    // Selection highlight ring around the cover
+    if (selected) {
+        epd.drawRect(x-2, y-2, w+4, h+4, 0x0000);
+        epd.drawRect(x-3, y-3, w+6, h+6, 0x0000);
+    }
+
+    // Title label below card (always shown for centre and adjacent sizes)
+    if (title && *title && w >= BOOK_ADJ_W) {
+        uint8_t fsz  = (w >= BOOK_SEL_W) ? 12 : 9;
+        bool    fbold = selected;
+        String  t(title);
+        while (t.length() > 1 &&
+               epd.getTextWidth(t.c_str(), fsz, fbold) > w + 20) {
+            t = t.substring(0, t.length() - 1);
+        }
+        int16_t tw = epd.getTextWidth(t.c_str(), fsz, fbold);
+        epd.drawText(cx - tw/2, y + h + fsz + 4, t.c_str(), fsz, fbold, 0x0000);
+    }
+
+    // Progress bar under title on the centre card
+    if (selected && total > 0) {
+        int16_t barY = y + h + (w >= BOOK_SEL_W ? 22 : 14);
+        int16_t barW = w;
+        epd.drawRect(cx - barW/2, barY, barW, 5, 0x0000);
+        int16_t fill = (int16_t)((int32_t)barW * page / total);
+        if (fill > 0) epd.fillRect(cx - barW/2, barY, fill, 5, 0x0000);
     }
 }
 
@@ -429,16 +435,19 @@ void UIManager::_drawBookCarousel() {
     if (n > 2) {
         int gi = (_bookIndex - 2 + n) % n;
         _drawBookCard(cx - OFF_GHOST, cy, BOOK_GHOST_W, BOOK_GHOST_H,
+                      _recentBooks[gi].filename.c_str(),
                       _recentBooks[gi].title.c_str(), 0, 0, false);
     }
     // Adjacent left
     if (n > 1) {
         int ai = (_bookIndex - 1 + n) % n;
         _drawBookCard(cx - OFF_ADJ, cy, BOOK_ADJ_W, BOOK_ADJ_H,
+                      _recentBooks[ai].filename.c_str(),
                       _recentBooks[ai].title.c_str(), 0, 0, false);
     }
     // Centre
     _drawBookCard(cx, cy, BOOK_SEL_W, BOOK_SEL_H,
+                  _recentBooks[_bookIndex].filename.c_str(),
                   _recentBooks[_bookIndex].title.c_str(),
                   _recentBooks[_bookIndex].currentPage,
                   _recentBooks[_bookIndex].totalPages,
@@ -447,12 +456,14 @@ void UIManager::_drawBookCarousel() {
     if (n > 1) {
         int ai = (_bookIndex + 1) % n;
         _drawBookCard(cx + OFF_ADJ, cy, BOOK_ADJ_W, BOOK_ADJ_H,
+                      _recentBooks[ai].filename.c_str(),
                       _recentBooks[ai].title.c_str(), 0, 0, false);
     }
     // Ghost right
     if (n > 2) {
         int gi = (_bookIndex + 2) % n;
         _drawBookCard(cx + OFF_GHOST, cy, BOOK_GHOST_W, BOOK_GHOST_H,
+                      _recentBooks[gi].filename.c_str(),
                       _recentBooks[gi].title.c_str(), 0, 0, false);
     }
 

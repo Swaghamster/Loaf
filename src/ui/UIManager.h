@@ -82,8 +82,10 @@ private:
     void drawStatusBar();
 
     // Draw one book card centred at (cx, cy).
+    // bookDir = bare directory name under /books/ (used to locate cover.bmp).
     void _drawBookCard(int16_t cx, int16_t cy, int16_t w, int16_t h,
-                       const char* title, int page, int total, bool selected);
+                       const char* bookDir, const char* title,
+                       int page, int total, bool selected);
 
     // Draw one app icon centred at (cx, cy).
     void _drawAppIcon(int16_t cx, int16_t cy, int itemIndex, bool selected);
