@@ -5,16 +5,17 @@
 #include "../../include/config.h"
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Home menu — iPod-style horizontal carousel
+// Home screen — two-zone layout
 //
-// The selected item sits large at the centre; two flanking items appear at
-// reduced size on either side, and partial "ghost" items peek in from the
-// edges to indicate there is more to scroll through.
+//   ┌──────────── status bar (20px) ─────────────┐
+//   │  [ghost] [adj] [ SELECTED BOOK ] [adj] [ghost]  │  book carousel
+//   │            · · ● · ·  (dots)               │
+//   ├────────────────────────────────────────────┤
+//   │  [Lib]  [Notes]  [Stats]  [Dict]  [Settings] │  app grid
+//   └─────────── hint bar ───────────────────────┘
 //
-// Navigation: LEFT / RIGHT (or UP / DOWN) spin the carousel.
-//
-//   ghost  |  prev  |  [SELECTED]  |  next  |  ghost
-//    50px     130px      200px        130px     50px
+// UP/DOWN switches active zone.  LEFT/RIGHT navigates within the zone.
+// SELECT opens the highlighted item.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -65,16 +66,36 @@ void UIManager::init() {
 void UIManager::handleButton(uint8_t btn, bool longPress) {
     switch (_current) {
 
-        // ── Home screen — carousel navigation ───────────────────────────────
+        // ── Home screen — two-zone navigation ───────────────────────────────
         case Screen::SCREEN_HOME:
-            if (btn == BTN_LEFT || btn == BTN_UP) {
-                _menuIndex = (_menuIndex - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
-                _dirty = true;
-            } else if (btn == BTN_RIGHT || btn == BTN_DOWN) {
-                _menuIndex = (_menuIndex + 1) % MENU_ITEM_COUNT;
-                _dirty = true;
+            if (btn == BTN_UP && _homeZone != 0) {
+                _homeZone = 0; _dirty = true;
+            } else if (btn == BTN_DOWN && _homeZone != 1) {
+                _homeZone = 1; _dirty = true;
+            } else if (btn == BTN_LEFT) {
+                if (_homeZone == 0 && _recentCount > 1) {
+                    _bookIndex = (_bookIndex - 1 + _recentCount) % _recentCount;
+                    _dirty = true;
+                } else if (_homeZone == 1) {
+                    _menuIndex = (_menuIndex - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
+                    _dirty = true;
+                }
+            } else if (btn == BTN_RIGHT) {
+                if (_homeZone == 0 && _recentCount > 1) {
+                    _bookIndex = (_bookIndex + 1) % _recentCount;
+                    _dirty = true;
+                } else if (_homeZone == 1) {
+                    _menuIndex = (_menuIndex + 1) % MENU_ITEM_COUNT;
+                    _dirty = true;
+                }
             } else if (btn == BTN_SELECT) {
-                navigateTo(kMenuItems[_menuIndex].screen);
+                if (_homeZone == 0) {
+                    navigateTo(_recentCount > 0
+                        ? Screen::SCREEN_READER
+                        : Screen::SCREEN_LIBRARY);
+                } else {
+                    navigateTo(kMenuItems[_menuIndex].screen);
+                }
             }
             break;
 
@@ -244,115 +265,95 @@ void UIManager::recordRecentBook(const String& title, const String& filename,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _drawCarouselCard — one app card for the centre carousel
-// selected = filled black;  adjacent = double-outlined;  ghost = single outline
+// _drawBookCard — one slot in the book carousel
+// Tries to load cover.bmp; falls back to a white placeholder with the title.
+// Draws a double selection ring when selected AND zone_active.
 // ─────────────────────────────────────────────────────────────────────────────
-void UIManager::_drawCarouselCard(int16_t cx, int16_t cy, int16_t size,
-                                  int itemIndex, bool selected) {
+void UIManager::_drawBookCard(int16_t cx, int16_t cy, int16_t w, int16_t h,
+                               int bookIdx, bool selected, bool zone_active) {
     EPDDisplay& epd = EPDDisplay::instance();
-    const int16_t half = size / 2;
-    const int16_t x = cx - half, y = cy - half;
+    const int16_t x = cx - w/2, y = cy - h/2;
 
-    if (selected) {
-        epd.fillRect(x, y, size, size, 0x0000);
-    } else {
-        epd.fillRect(x, y, size, size, 0xFFFF);
-        epd.drawRect(x, y, size, size, 0x0000);
-        if (size >= CAR_ADJ_SZ)
-            epd.drawRect(x+2, y+2, size-4, size-4, 0x0000);
+    bool hasCover = false;
+    if (bookIdx >= 0 && bookIdx < _recentCount) {
+        hasCover = CoverLoader::draw(
+            _recentBooks[bookIdx].filename.c_str(), x, y, w, h);
     }
 
-    uint16_t fg = selected ? 0xFFFF : 0x0000;
-    int16_t p = size / 6, in = size - p*2;
-    int16_t ix = x+p, iy = y+p;
-
-    switch (itemIndex % MENU_ITEM_COUNT) {
-        case 0: // Library — stacked lines
-            for (int r=0; r<3; ++r)
-                epd.drawLine(ix, iy+in/4+r*in/4, ix+in, iy+in/4+r*in/4, fg);
-            break;
-        case 1: // Notes — lined page
-            epd.drawRect(ix, iy, in, in, fg);
-            for (int r=0; r<3; ++r)
-                epd.drawLine(ix+3, iy+in/5+r*in/4, ix+in-3, iy+in/5+r*in/4, fg);
-            break;
-        case 2: // Stats — bar chart
-            epd.fillRect(cx-in/3-2, iy+in/2,  in/4, in/2,   fg);
-            epd.fillRect(cx-in/8,   iy+in/3,  in/4, in*2/3, fg);
-            epd.fillRect(cx+in/4+2, iy+in/5,  in/4, in*4/5, fg);
-            break;
-        case 3: // Dict — open book
-            epd.drawLine(cx, iy,    cx, iy+in, fg);
-            epd.drawLine(ix, iy+2,  cx, iy,    fg);
-            epd.drawLine(ix, iy+in, cx, iy+in, fg);
-            epd.drawLine(cx, iy,    ix+in, iy+2,  fg);
-            epd.drawLine(cx, iy+in, ix+in, iy+in, fg);
-            break;
-        case 4: // Settings — gear
-            epd.drawRect(cx-in/4, cy-in/4, in/2, in/2, fg);
-            epd.drawLine(cx, iy,         cx, iy+in/5,     fg);
-            epd.drawLine(cx, iy+in*4/5,  cx, iy+in,       fg);
-            epd.drawLine(ix, cy,         ix+in/5,   cy,   fg);
-            epd.drawLine(ix+in*4/5, cy,  ix+in,     cy,   fg);
-            break;
-        default: break;
+    if (!hasCover) {
+        epd.fillRect(x, y, w, h, 0xFFFF);
+        epd.drawRect(x, y, w, h, 0x0000);
+        if (bookIdx >= 0 && bookIdx < _recentCount) {
+            const char* t = _recentBooks[bookIdx].title.c_str();
+            int16_t fsz = (w >= BOOK_SEL_W) ? 12 : 9;
+            int16_t tw  = epd.getTextWidth(t, fsz, false);
+            epd.drawText(cx - tw/2, cy + 4, t, fsz, false, 0x0000);
+        }
     }
 
-    // Label below — only for selected and adjacent (not tiny ghosts)
-    if (size >= CAR_ADJ_SZ) {
-        const char* lbl  = kMenuItems[itemIndex % MENU_ITEM_COUNT].label;
-        uint8_t     fsz  = selected ? 20 : 14;
-        bool        fbold = selected;
-        int16_t     lw   = epd.getTextWidth(lbl, fsz, fbold);
-        epd.drawText(cx - lw/2, y + size + fsz + 4, lbl, fsz, fbold, 0x0000);
+    if (selected && zone_active) {
+        epd.drawRect(x - 3, y - 3, w + 6,  h + 6,  0x0000);
+        epd.drawRect(x - 5, y - 5, w + 10, h + 10, 0x0000);
+
+        // Progress bar below selected card
+        if (bookIdx >= 0 && bookIdx < _recentCount) {
+            const RecentBook& b = _recentBooks[bookIdx];
+            if (b.totalPages > 0) {
+                int16_t barW = w + 10;
+                int16_t barX = cx - barW / 2;
+                int16_t barY = y + h + 8;
+                epd.drawRect(barX, barY, barW, 5, 0x0000);
+                int16_t filled = (int16_t)((int32_t)barW * b.currentPage / b.totalPages);
+                if (filled > 0) epd.fillRect(barX, barY, filled, 5, 0x0000);
+            }
+        }
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _drawAppCarousel — iPod-style horizontal app selector, centred on screen
+// _drawBookCarousel — iPod-style book carousel in the top zone
 // ─────────────────────────────────────────────────────────────────────────────
-void UIManager::_drawAppCarousel() {
-    const int16_t cx = EPD_WIDTH / 2;
-    // Vertical centre of carousel — sits between status bar and strip
-    const int16_t cy = CONTENT_Y + (STRIP_Y - CONTENT_Y) / 2;
+void UIManager::_drawBookCarousel() {
+    const int16_t cx  = EPD_WIDTH / 2;
+    const int16_t cy  = BOOK_ZONE_TOP + (BOOK_ZONE_BOT - BOOK_ZONE_TOP) / 2;
+    const bool   zact = (_homeZone == 0);
 
-    static constexpr int16_t OFF_ADJ   = 185;
-    static constexpr int16_t OFF_GHOST = 325;
-    const int n = MENU_ITEM_COUNT;
+    static constexpr int16_t OFF_ADJ   = 178;
+    static constexpr int16_t OFF_GHOST = 310;
 
-    // Ghost left
-    _drawCarouselCard(cx - OFF_GHOST, cy, CAR_GHOST_SZ,
-                      (_menuIndex - 2 + n) % n, false);
-    // Adjacent left
-    _drawCarouselCard(cx - OFF_ADJ,   cy, CAR_ADJ_SZ,
-                      (_menuIndex - 1 + n) % n, false);
-    // Centre — selected
-    _drawCarouselCard(cx,             cy, CAR_SEL_SZ,
-                      _menuIndex,          true);
-    // Adjacent right
-    _drawCarouselCard(cx + OFF_ADJ,   cy, CAR_ADJ_SZ,
-                      (_menuIndex + 1) % n, false);
-    // Ghost right
-    _drawCarouselCard(cx + OFF_GHOST, cy, CAR_GHOST_SZ,
-                      (_menuIndex + 2) % n, false);
+    int gi_l = (_recentCount > 2) ? (_bookIndex - 2 + _recentCount) % _recentCount : -1;
+    int ai_l = (_recentCount > 1) ? (_bookIndex - 1 + _recentCount) % _recentCount : -1;
+    int ci   = (_recentCount > 0) ? _bookIndex : -1;
+    int ai_r = (_recentCount > 1) ? (_bookIndex + 1) % _recentCount : -1;
+    int gi_r = (_recentCount > 2) ? (_bookIndex + 2) % _recentCount : -1;
 
-    // Dot indicators below carousel labels
+    _drawBookCard(cx - OFF_GHOST, cy, BOOK_GHOST_W, BOOK_GHOST_H, gi_l, false, zact);
+    _drawBookCard(cx - OFF_ADJ,   cy, BOOK_ADJ_W,   BOOK_ADJ_H,   ai_l, false, zact);
+    _drawBookCard(cx,             cy, BOOK_SEL_W,   BOOK_SEL_H,   ci,   true,  zact);
+    _drawBookCard(cx + OFF_ADJ,   cy, BOOK_ADJ_W,   BOOK_ADJ_H,   ai_r, false, zact);
+    _drawBookCard(cx + OFF_GHOST, cy, BOOK_GHOST_W, BOOK_GHOST_H, gi_r, false, zact);
+
     EPDDisplay& epd = EPDDisplay::instance();
-    const int16_t dotY   = STRIP_Y - 16;
-    const int16_t dotR   = 4;
-    const int16_t dotGap = 14;
-    int16_t dotX = cx - (n * dotGap) / 2 + dotR;
-    for (int i = 0; i < n; ++i) {
-        if (i == _menuIndex)
-            epd.fillRect(dotX - dotR, dotY - dotR, dotR*2, dotR*2, 0x0000);
-        else
-            epd.drawRect(dotX - dotR, dotY - dotR, dotR*2, dotR*2, 0x0000);
-        dotX += dotGap;
+    if (_recentCount == 0) {
+        const char* msg = "No recent books — open Library";
+        int16_t mw = epd.getTextWidth(msg, 12, false);
+        epd.drawText(cx - mw/2, BOOK_ZONE_BOT - 18, msg, 12, false, 0x0000);
+    } else if (_recentCount > 1) {
+        const int16_t dotY   = BOOK_ZONE_BOT - 10;
+        const int16_t dotR   = 3, dotGap = 10;
+        int16_t dotX = cx - (_recentCount * dotGap) / 2 + dotR;
+        for (int i = 0; i < _recentCount; ++i) {
+            if (i == _bookIndex)
+                epd.fillRect(dotX - dotR, dotY - dotR, dotR*2, dotR*2, 0x0000);
+            else
+                epd.drawRect(dotX - dotR, dotY - dotR, dotR*2, dotR*2, 0x0000);
+            dotX += dotGap;
+        }
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _drawAppIcon — small icon for the bottom reference strip
+// _drawAppIcon — one icon in the app grid
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::_drawAppIcon(int16_t cx, int16_t cy, int idx, bool selected) {
     EPDDisplay& epd = EPDDisplay::instance();
@@ -370,63 +371,73 @@ void UIManager::_drawAppIcon(int16_t cx, int16_t cy, int idx, bool selected) {
     int16_t p = s/6, in = s-p*2, ix = x+p, iy = y+p;
 
     switch (idx) {
-        case 0:
-            for (int r=0;r<3;++r) epd.drawLine(ix, iy+in/4+r*in/4, ix+in, iy+in/4+r*in/4, fg);
+        case 0: // Library
+            for (int r=0;r<3;++r)
+                epd.drawLine(ix, iy+in/4+r*in/4, ix+in, iy+in/4+r*in/4, fg);
             break;
-        case 1:
-            epd.drawRect(ix,iy,in,in,fg);
-            for (int r=0;r<2;++r) epd.drawLine(ix+2, iy+in/4+r*in/3, ix+in-2, iy+in/4+r*in/3, fg);
+        case 1: // Notes
+            epd.drawRect(ix, iy, in, in, fg);
+            for (int r=0;r<2;++r)
+                epd.drawLine(ix+2, iy+in/4+r*in/3, ix+in-2, iy+in/4+r*in/3, fg);
             break;
-        case 2:
-            epd.fillRect(cx-in/3-2,iy+in/2,in/4,in/2,fg);
-            epd.fillRect(cx-in/8,  iy+in/3,in/4,in*2/3,fg);
-            epd.fillRect(cx+in/4+2,iy+in/5,in/4,in*4/5,fg);
+        case 2: // Stats
+            epd.fillRect(cx-in/3-2, iy+in/2,  in/4, in/2,   fg);
+            epd.fillRect(cx-in/8,   iy+in/3,  in/4, in*2/3, fg);
+            epd.fillRect(cx+in/4+2, iy+in/5,  in/4, in*4/5, fg);
             break;
-        case 3:
-            epd.drawLine(cx,iy,cx,iy+in,fg);
-            epd.drawLine(ix,iy+2,cx,iy,fg); epd.drawLine(ix,iy+in,cx,iy+in,fg);
-            epd.drawLine(cx,iy,ix+in,iy+2,fg); epd.drawLine(cx,iy+in,ix+in,iy+in,fg);
+        case 3: // Dict
+            epd.drawLine(cx, iy, cx, iy+in, fg);
+            epd.drawLine(ix, iy+2, cx, iy, fg);
+            epd.drawLine(ix, iy+in, cx, iy+in, fg);
+            epd.drawLine(cx, iy, ix+in, iy+2, fg);
+            epd.drawLine(cx, iy+in, ix+in, iy+in, fg);
             break;
-        case 4:
-            epd.drawRect(cx-in/4,cy-in/4,in/2,in/2,fg);
-            epd.drawLine(cx,iy,cx,iy+in/5,fg); epd.drawLine(cx,iy+in*4/5,cx,iy+in,fg);
-            epd.drawLine(ix,cy,ix+in/5,cy,fg); epd.drawLine(ix+in*4/5,cy,ix+in,cy,fg);
+        case 4: // Settings
+            epd.drawRect(cx-in/4, cy-in/4, in/2, in/2, fg);
+            epd.drawLine(cx, iy,        cx, iy+in/5,    fg);
+            epd.drawLine(cx, iy+in*4/5, cx, iy+in,      fg);
+            epd.drawLine(ix, cy,        ix+in/5,   cy,  fg);
+            epd.drawLine(ix+in*4/5, cy, ix+in,     cy,  fg);
             break;
         default: break;
     }
 
     const char* lbl = kMenuItems[idx].label;
-    int16_t lw = epd.getTextWidth(lbl, 9, false);
-    epd.drawText(cx - lw/2, y + s + 11, lbl, 9, false, 0x0000);
+    int16_t lw = epd.getTextWidth(lbl, 10, false);
+    epd.drawText(cx - lw/2, y + s + 12, lbl, 10, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _drawAppStrip — small reference icons at the bottom
+// _drawAppGrid — 5-icon row in the bottom zone
 // ─────────────────────────────────────────────────────────────────────────────
-void UIManager::_drawAppStrip() {
+void UIManager::_drawAppGrid() {
     EPDDisplay& epd = EPDDisplay::instance();
-    epd.drawLine(0, STRIP_Y, EPD_WIDTH-1, STRIP_Y, 0x0000);
+    epd.drawLine(0, APP_ZONE_TOP - 2, EPD_WIDTH - 1, APP_ZONE_TOP - 2, 0x0000);
 
     const int16_t step = EPD_WIDTH / MENU_ITEM_COUNT;
-    const int16_t cy   = STRIP_Y + (EPD_HEIGHT - STRIP_Y - 14) / 2;
+    const int16_t cy   = APP_ZONE_TOP + (EPD_HEIGHT - APP_ZONE_TOP - 24) / 2;
+    const bool    zact = (_homeZone == 1);
+
     for (int i = 0; i < MENU_ITEM_COUNT; ++i) {
-        int16_t cx = (int16_t)(step/2 + i * step);
-        _drawAppIcon(cx, cy, i, i == _menuIndex);
+        int16_t cx = (int16_t)(step / 2 + i * step);
+        _drawAppIcon(cx, cy, i, (i == _menuIndex) && zact);
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // renderHome
-// Layout: status bar | app carousel (centre) | divider | app strip (bottom)
+// Layout: status bar | book carousel | divider | app grid | hint
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::renderHome() {
-    _drawAppCarousel();
-    _drawAppStrip();
+    _drawBookCarousel();
+    _drawAppGrid();
 
     EPDDisplay& epd = EPDDisplay::instance();
-    const char* hint = "L/R: browse   SEL: open";
+    const char* hint = (_homeZone == 0)
+        ? "L/R: books   DN: apps   SEL: open"
+        : "UP: books   L/R: apps   SEL: open";
     int16_t hw = epd.getTextWidth(hint, 9, false);
-    epd.drawText((EPD_WIDTH - hw)/2, EPD_HEIGHT - 3, hint, 9, false, 0x0000);
+    epd.drawText((EPD_WIDTH - hw) / 2, EPD_HEIGHT - 6, hint, 9, false, 0x0000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

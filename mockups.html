@@ -30,13 +30,14 @@
 <body>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
-     SCREEN 1 — Home  (iPod carousel layout)
-     Status bar | App carousel centred | Divider | App icon strip
+     SCREEN 1 — Home  (two-zone: book carousel top, app grid bottom)
+     BOOK_ZONE_TOP=22, BOOK_ZONE_BOT=270, APP_ZONE_TOP=278
+     cy(books)=22+(270-22)/2=146   cy(apps)=278+(480-278-24)/2=367
      ══════════════════════════════════════════════════════════════════════ -->
-<h2>1 — Home Screen (iPod Carousel)</h2>
+<h2>1 — Home Screen (book carousel + app grid)</h2>
 <div class="screen">
 
-  <!-- ── Status bar (0–20px) ──────────────────────────────────────────────── -->
+  <!-- ── Status bar ───────────────────────────────────────────────────────── -->
   <div style="position:absolute;top:0;left:0;right:0;height:20px;border-bottom:1px solid #111;">
     <div style="position:absolute;left:4px;top:4px;width:18px;height:12px;border:1px solid #111;"></div>
     <div style="position:absolute;left:6px;top:6px;width:11px;height:8px;background:#111;"></div>
@@ -45,120 +46,123 @@
     <span class="text f9" style="right:6px;top:14px;">0:04</span>
   </div>
 
-  <!-- ── App Carousel ──────────────────────────────────────────────────────
-       cx=400, cy=206  (midpoint of CONTENT_Y=22 .. STRIP_Y=390)
-       ghost-L  adj-L     [SELECTED]    adj-R  ghost-R
-       cx: 75    215         400          585    725
-       sz: 58    105         160          105    58
+  <!-- ── Book carousel ─────────────────────────────────────────────────────
+       cx=400, cy=146
+       ghost-L cx=90  adj-L cx=222  [CENTRE cx=400]  adj-R cx=578  ghost-R cx=710
+       sizes:  48×64          85×115         130×170          85×115         48×64
   ────────────────────────────────────────────────────────────────────────── -->
 
-  <!-- ghost left — Library icon (cx=75, cy=206, 58×58) -->
-  <div style="position:absolute;left:46px;top:177px;width:58px;height:58px;border:1px solid #999;background:#f4f0e6;">
-    <!-- stacked lines = library -->
-    <div style="position:absolute;left:10px;top:17px;right:10px;height:1px;background:#999;"></div>
-    <div style="position:absolute;left:10px;top:26px;right:16px;height:1px;background:#999;"></div>
-    <div style="position:absolute;left:10px;top:35px;right:12px;height:1px;background:#999;"></div>
+  <!-- ghost left — Dune (cx=90, cy=146, 48×64) -->
+  <div style="position:absolute;left:66px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(170deg,#111 0,#111 2px,#e8e4da 2px,#e8e4da 5px,#888 5px,#888 7px,#e8e4da 7px,#e8e4da 10px);"></div>
   </div>
 
-  <!-- adjacent left — Notes icon (cx=215, cy=206, 105×105), double outline -->
-  <div style="position:absolute;left:163px;top:154px;width:105px;height:105px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:1px solid #111;"></div>
-    <!-- lined page -->
-    <div style="position:absolute;left:12px;top:22px;width:60px;height:50px;border:1px solid #111;"></div>
-    <div style="position:absolute;left:17px;top:31px;right:27px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:17px;top:40px;right:27px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:17px;top:49px;right:27px;height:1px;background:#111;"></div>
-  </div>
-  <span class="text f9" style="left:174px;top:277px;">Notes</span>
-
-  <!-- CENTRE selected — Stats (cx=400, cy=206, 160×160), filled black -->
-  <div style="position:absolute;left:320px;top:126px;width:160px;height:160px;background:#111;">
-    <!-- bar chart in white -->
-    <div style="position:absolute;left:38px;top:80px;width:24px;height:50px;background:#f4f0e6;"></div>
-    <div style="position:absolute;left:68px;top:55px;width:24px;height:75px;background:#f4f0e6;"></div>
-    <div style="position:absolute;left:98px;top:35px;width:24px;height:95px;background:#f4f0e6;"></div>
-  </div>
-  <span class="text f20 bold" style="left:337px;top:310px;">Stats</span>
-
-  <!-- adjacent right — Dict (cx=585, cy=206, 105×105), double outline -->
-  <div style="position:absolute;left:533px;top:154px;width:105px;height:105px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:2px;top:2px;right:2px;bottom:2px;border:1px solid #111;"></div>
-    <!-- open book -->
-    <div style="position:absolute;left:52px;top:22px;width:1px;height:50px;background:#111;"></div>
-    <div style="position:absolute;left:15px;top:22px;width:37px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:15px;top:72px;width:37px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:53px;top:22px;width:37px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:53px;top:72px;width:37px;height:1px;background:#111;"></div>
-  </div>
-  <span class="text f9" style="left:549px;top:277px;">Dict</span>
-
-  <!-- ghost right — Settings icon (cx=725, cy=206, 58×58) -->
-  <div style="position:absolute;left:696px;top:177px;width:58px;height:58px;border:1px solid #999;background:#f4f0e6;">
-    <div style="position:absolute;left:15px;top:15px;width:20px;height:20px;border:1px solid #999;"></div>
-    <div style="position:absolute;left:24px;top:8px;width:1px;height:6px;background:#999;"></div>
-    <div style="position:absolute;left:24px;top:37px;width:1px;height:6px;background:#999;"></div>
-    <div style="position:absolute;left:8px;top:24px;width:6px;height:1px;background:#999;"></div>
-    <div style="position:absolute;left:37px;top:24px;width:6px;height:1px;background:#999;"></div>
+  <!-- adjacent left — Neuromancer (cx=222, cy=146, 85×115) -->
+  <div style="position:absolute;left:180px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:18px;height:1px;background:#f4f0e6;opacity:.6;"></div>
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#f4f0e6;opacity:.8;"></div>
+    <div style="position:absolute;left:0;right:0;top:55px;height:1px;background:#f4f0e6;opacity:.4;"></div>
+    <div style="position:absolute;left:0;right:0;top:78px;height:1px;background:#f4f0e6;opacity:.3;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#f4f0e6;font-size:8px;font-weight:bold;line-height:11px;">NEURO<br>MANCER</span>
   </div>
 
-  <!-- ── Dot indicators (dotY=374, 5 dots centred on 400) ─────────────────── -->
-  <!-- selected dot (filled) at x=365, then 379,393,407,421 -->
-  <div style="position:absolute;top:366px;left:365px;width:8px;height:8px;background:#111;"></div>
-  <div style="position:absolute;top:367px;left:379px;width:6px;height:6px;border:1px solid #555;"></div>
-  <div style="position:absolute;top:367px;left:393px;width:6px;height:6px;border:1px solid #555;"></div>
-  <div style="position:absolute;top:367px;left:407px;width:6px;height:6px;border:1px solid #555;"></div>
-  <div style="position:absolute;top:367px;left:421px;width:6px;height:6px;border:1px solid #555;"></div>
+  <!-- CENTRE selected — The Midnight Library (cx=400, cy=146, 130×170) -->
+  <!-- double selection ring: -5px and -3px outset -->
+  <div style="position:absolute;left:265px;top:56px;width:140px;height:180px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:267px;top:58px;width:136px;height:176px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <!-- stylised library shelves -->
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:75px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:115px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:155px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:8px;width:8px;height:25px;background:#111;"></div>
+    <div style="position:absolute;left:18px;top:12px;width:12px;height:21px;background:#555;"></div>
+    <div style="position:absolute;left:32px;top:6px;width:7px;height:27px;background:#111;"></div>
+    <div style="position:absolute;left:41px;top:10px;width:10px;height:23px;background:#888;"></div>
+    <div style="position:absolute;left:8px;top:43px;width:13px;height:25px;background:#555;"></div>
+    <div style="position:absolute;left:23px;top:39px;width:8px;height:29px;background:#111;"></div>
+    <div style="position:absolute;left:33px;top:45px;width:12px;height:22px;background:#888;"></div>
+    <span style="position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:9px;font-weight:bold;color:#111;line-height:12px;">The Midnight<br>Library</span>
+  </div>
+  <!-- progress bar (70% read) -->
+  <div style="position:absolute;left:265px;top:242px;width:140px;height:5px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:265px;top:242px;width:98px;height:5px;background:#111;"></div>
+  <span class="text f9" style="left:280px;top:256px;color:#555;">p.217 of 310</span>
 
-  <!-- ── Divider (STRIP_Y=390) ────────────────────────────────────────────── -->
-  <div class="hline" style="top:390px;"></div>
+  <!-- adjacent right — Snow Crash (cx=578, cy=146, 85×115) -->
+  <div style="position:absolute;left:536px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,#111 0,#111 2px,#f4f0e6 2px,#f4f0e6 8px);opacity:.12;"></div>
+    <div style="position:absolute;left:8px;top:28px;right:8px;height:3px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:48px;right:24px;height:2px;background:#555;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#111;font-size:8px;font-weight:bold;line-height:11px;">SNOW<br>CRASH</span>
+  </div>
 
-  <!-- ── App icon strip (cy=428, step=160, first cx=80) ───────────────────── -->
+  <!-- ghost right — 1984 (cx=710, cy=146, 48×64) -->
+  <div style="position:absolute;left:686px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <div style="position:absolute;left:4px;top:10px;right:4px;height:1px;background:#f4f0e6;opacity:.4;"></div>
+    <span style="position:absolute;bottom:4px;left:3px;color:#f4f0e6;font-size:7px;">1984</span>
+  </div>
+
+  <!-- ── Dot indicators (3 books shown, dotY=260, cx=400) ─────────────────── -->
+  <div style="position:absolute;top:257px;left:387px;width:6px;height:6px;background:#111;"></div>
+  <div style="position:absolute;top:258px;left:397px;width:4px;height:4px;border:1px solid #555;"></div>
+  <div style="position:absolute;top:258px;left:407px;width:4px;height:4px;border:1px solid #555;"></div>
+
+  <!-- ── Divider (APP_ZONE_TOP-2 = 276) ───────────────────────────────────── -->
+  <div class="hline" style="top:276px;"></div>
+
+  <!-- ── App grid (cy=367, step=160, first cx=80, icon 52×52) ─────────────── -->
+
   <!-- Library (cx=80, not selected) -->
-  <div style="position:absolute;left:60px;top:408px;width:40px;height:40px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:5px;top:10px;right:5px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:5px;top:18px;right:9px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:5px;top:26px;right:7px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:54px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
+    <div style="position:absolute;left:7px;top:14px;right:7px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:7px;top:23px;right:11px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:7px;top:32px;right:9px;height:1px;background:#111;"></div>
   </div>
-  <span class="text f9" style="left:64px;top:459px;">Library</span>
+  <span class="text f9" style="left:58px;top:405px;">Library</span>
 
   <!-- Notes (cx=240, not selected) -->
-  <div style="position:absolute;left:220px;top:408px;width:40px;height:40px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:6px;top:6px;width:28px;height:24px;border:1px solid #111;"></div>
-    <div style="position:absolute;left:10px;top:12px;right:10px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:10px;top:19px;right:14px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:214px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
+    <div style="position:absolute;left:8px;top:8px;width:34px;height:30px;border:1px solid #111;"></div>
+    <div style="position:absolute;left:13px;top:16px;right:13px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:13px;top:24px;right:17px;height:1px;background:#111;"></div>
   </div>
-  <span class="text f9" style="left:228px;top:459px;">Notes</span>
+  <span class="text f9" style="left:224px;top:405px;">Notes</span>
 
-  <!-- Stats (cx=400, SELECTED — filled black) -->
-  <div style="position:absolute;left:380px;top:408px;width:40px;height:40px;background:#111;">
-    <div style="position:absolute;left:5px;top:22px;width:7px;height:12px;background:#f4f0e6;"></div>
-    <div style="position:absolute;left:17px;top:16px;width:7px;height:18px;background:#f4f0e6;"></div>
-    <div style="position:absolute;left:29px;top:10px;width:7px;height:24px;background:#f4f0e6;"></div>
+  <!-- Stats (cx=400, SELECTED — book zone active so app zone NOT highlighted) -->
+  <div style="position:absolute;left:374px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
+    <div style="position:absolute;left:7px;top:28px;width:11px;height:16px;background:#111;"></div>
+    <div style="position:absolute;left:21px;top:20px;width:11px;height:24px;background:#111;"></div>
+    <div style="position:absolute;left:35px;top:12px;width:11px;height:32px;background:#111;"></div>
   </div>
-  <span class="text f9 bold" style="left:385px;top:459px;">Stats</span>
+  <span class="text f9" style="left:384px;top:405px;">Stats</span>
 
   <!-- Dict (cx=560, not selected) -->
-  <div style="position:absolute;left:540px;top:408px;width:40px;height:40px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:20px;top:6px;width:1px;height:26px;background:#111;"></div>
-    <div style="position:absolute;left:6px;top:6px;width:14px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:6px;top:32px;width:14px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:21px;top:6px;width:14px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:21px;top:32px;width:14px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:534px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
+    <div style="position:absolute;left:26px;top:9px;width:1px;height:32px;background:#111;"></div>
+    <div style="position:absolute;left:9px;top:9px;width:17px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:9px;top:41px;width:17px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:27px;top:9px;width:17px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:27px;top:41px;width:17px;height:1px;background:#111;"></div>
   </div>
-  <span class="text f9" style="left:545px;top:459px;">Dict</span>
+  <span class="text f9" style="left:540px;top:405px;">Dict</span>
 
   <!-- Settings (cx=720, not selected) -->
-  <div style="position:absolute;left:700px;top:408px;width:40px;height:40px;border:1px solid #111;background:#f4f0e6;">
-    <div style="position:absolute;left:12px;top:12px;width:16px;height:16px;border:1px solid #111;"></div>
-    <div style="position:absolute;left:19px;top:5px;width:1px;height:6px;background:#111;"></div>
-    <div style="position:absolute;left:19px;top:29px;width:1px;height:6px;background:#111;"></div>
-    <div style="position:absolute;left:5px;top:19px;width:6px;height:1px;background:#111;"></div>
-    <div style="position:absolute;left:29px;top:19px;width:6px;height:1px;background:#111;"></div>
+  <div style="position:absolute;left:694px;top:341px;width:52px;height:52px;border:1px solid #111;background:#f4f0e6;">
+    <div style="position:absolute;left:17px;top:17px;width:18px;height:18px;border:1px solid #111;"></div>
+    <div style="position:absolute;left:25px;top:8px;width:1px;height:8px;background:#111;"></div>
+    <div style="position:absolute;left:25px;top:36px;width:1px;height:8px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:25px;width:8px;height:1px;background:#111;"></div>
+    <div style="position:absolute;left:36px;top:25px;width:8px;height:1px;background:#111;"></div>
   </div>
-  <span class="text f9" style="left:698px;top:459px;">Settings</span>
+  <span class="text f9" style="left:694px;top:405px;">Settings</span>
 
-  <!-- ── Bottom hint ──────────────────────────────────────────────────────── -->
-  <span class="text f9" style="left:272px;top:474px;">L/R: browse   SEL: open</span>
+  <!-- ── Bottom hint (book zone active) ───────────────────────────────────── -->
+  <span class="text f9" style="left:236px;top:470px;">L/R: books   DN: apps   SEL: open</span>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════

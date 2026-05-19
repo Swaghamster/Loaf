@@ -58,14 +58,12 @@ private:
     void renderDict();
 
     // ── Home helpers ──────────────────────────────────────────────────────
-    // Centre carousel: iPod-style app selector
-    void _drawAppCarousel();
-    // Bottom strip: small reference icons for all apps
-    void _drawAppStrip();
-    // Draw one carousel card centred at (cx, cy)
-    void _drawCarouselCard(int16_t cx, int16_t cy, int16_t size,
-                           int itemIndex, bool selected);
-    // Draw one small bottom-strip icon
+    // Top zone: book carousel with real covers
+    void _drawBookCarousel();
+    void _drawBookCard(int16_t cx, int16_t cy, int16_t w, int16_t h,
+                       int bookIdx, bool selected, bool zone_active);
+    // Bottom zone: app icons grid
+    void _drawAppGrid();
     void _drawAppIcon(int16_t cx, int16_t cy, int itemIndex, bool selected);
 
     // ── Shared ────────────────────────────────────────────────────────────
@@ -74,10 +72,11 @@ private:
     // ── State ─────────────────────────────────────────────────────────────
     Screen _current  = Screen::SCREEN_HOME;
     std::vector<Screen> _history;
-    bool   _dirty    = true;
-    int    _menuIndex = 0;   // selected app (0-4)
+    bool   _dirty     = true;
+    int    _menuIndex = 0;   // selected app in grid (0–4)
+    int    _homeZone  = 0;   // 0=book carousel, 1=app grid
+    int    _bookIndex = 0;   // selected book in carousel
 
-    // Recent books kept for future use (not shown on home in this layout)
     struct RecentBook {
         String title;
         String filename;
@@ -88,15 +87,20 @@ private:
     int        _recentCount = 0;
 
     // Status bar
-    static constexpr int16_t STATUS_H   = 20;
-    static constexpr int16_t CONTENT_Y  = STATUS_H + 2;
+    static constexpr int16_t STATUS_H  = 20;
+    static constexpr int16_t CONTENT_Y = STATUS_H + 2;
 
-    // Carousel card sizes
-    static constexpr int16_t CAR_SEL_SZ   = 160;  // selected (centre)
-    static constexpr int16_t CAR_ADJ_SZ   = 105;  // adjacent
-    static constexpr int16_t CAR_GHOST_SZ =  58;  // ghost (edge peek)
+    // Book carousel zone (top half of screen)
+    static constexpr int16_t BOOK_ZONE_TOP = CONTENT_Y;
+    static constexpr int16_t BOOK_ZONE_BOT = 270;
+    static constexpr int16_t BOOK_SEL_W    = 130;
+    static constexpr int16_t BOOK_SEL_H    = 170;
+    static constexpr int16_t BOOK_ADJ_W    =  85;
+    static constexpr int16_t BOOK_ADJ_H    = 115;
+    static constexpr int16_t BOOK_GHOST_W  =  48;
+    static constexpr int16_t BOOK_GHOST_H  =  64;
 
-    // Bottom strip
-    static constexpr int16_t STRIP_Y     = 390;   // top of strip zone
-    static constexpr int16_t APP_ICON_SZ =  40;
+    // App grid zone (bottom half of screen)
+    static constexpr int16_t APP_ZONE_TOP  = 278;
+    static constexpr int16_t APP_ICON_SZ   =  52;
 };
