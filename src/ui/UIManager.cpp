@@ -31,7 +31,6 @@ static const MenuItem kMenuItems[UIManager::MENU_ITEM_COUNT] = {
     { "Stats",      Screen::SCREEN_STATS    },
     { "Dictionary", Screen::SCREEN_DICT     },
     { "Settings",   Screen::SCREEN_SETTINGS },
-    { "Games",      Screen::SCREEN_GAMES    },
     { "Apps",       Screen::SCREEN_APPS     },
     { "Terminal",   Screen::SCREEN_TERMINAL },
 };
@@ -142,7 +141,6 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
             }
             break;
 
-        case Screen::SCREEN_GAMES:
         case Screen::SCREEN_APPS:
             if (btn == BTN_BACK) {
                 back();
@@ -204,7 +202,6 @@ void UIManager::render() {
         case Screen::SCREEN_SETTINGS: renderSettings(); break;
         case Screen::SCREEN_NOTES:    renderNotes();    break;
         case Screen::SCREEN_DICT:     renderDict();     break;
-        case Screen::SCREEN_GAMES:    renderGames();    break;
         case Screen::SCREEN_APPS:     renderApps();     break;
         case Screen::SCREEN_TERMINAL: renderTerminal(); break;
         default: break;
@@ -590,24 +587,6 @@ void UIManager::renderDict() {
                  "Look up: (no keyboard input yet)", 16, false, 0x0000);
     epd.drawText(MARGIN_X, CONTENT_Y + 74,
                  "Connect BLE keyboard to search.", 12, false, 0x0000);
-
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// renderGames
-// ─────────────────────────────────────────────────────────────────────────────
-void UIManager::renderGames() {
-    EPDDisplay& epd = EPDDisplay::instance();
-
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Games", 20, true, 0x0000);
-    epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
-
-    epd.drawText(MARGIN_X, CONTENT_Y + 50,
-                 "No games installed.", 16, false, 0x0000);
-    epd.drawText(MARGIN_X, CONTENT_Y + 74,
-                 "Copy game files to /games/ on SD card.", 12, false, 0x0000);
 
     epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
 }

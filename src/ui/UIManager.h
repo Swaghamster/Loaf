@@ -12,7 +12,6 @@ enum class Screen : uint8_t {
     SCREEN_SETTINGS,
     SCREEN_NOTES,
     SCREEN_DICT,
-    SCREEN_GAMES,
     SCREEN_APPS,
     SCREEN_TERMINAL,
 };
@@ -42,7 +41,7 @@ public:
     Screen currentScreen() const { return _current; }
     int    selectedMenuItem() const { return _menuIndex; }
 
-    static constexpr int MENU_ITEM_COUNT   = 8;   // Library Notes Stats Dict Settings Games Apps Terminal
+    static constexpr int MENU_ITEM_COUNT   = 7;   // Library Notes Stats Dict Settings Apps Terminal
     static constexpr int MENU_VISIBLE_ROWS = 7;   // rows shown at once; list scrolls when count > 7
     static constexpr int RECENT_BOOKS_MAX = 10;
 
@@ -60,7 +59,6 @@ private:
     void renderSettings();
     void renderNotes();
     void renderDict();
-    void renderGames();
     void renderApps();
     void renderTerminal();
 
