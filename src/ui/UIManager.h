@@ -82,6 +82,11 @@ private:
     int    _homeZone   = 0;   // 0=book carousel, 1=menu list
     int    _bookIndex  = 0;   // selected book in carousel
 
+    // Library screen state
+    int                 _libIndex  = 0;
+    int                 _libScroll = 0;
+    std::vector<String> _libBooks;          // bare dir names under /books/
+
     struct RecentBook {
         String title;
         String filename;

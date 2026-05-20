@@ -2,6 +2,7 @@
 #include "../display/EPDDisplay.h"
 #include "../storage/FileManager.h"
 #include "../reader/CoverLoader.h"
+#include "../reader/BookReader.h"
 #include "../terminal/TerminalApp.h"
 #include "../../include/config.h"
 
@@ -96,9 +97,15 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
                 _dirty = true;
             } else if (btn == BTN_SELECT) {
                 if (_homeZone == 0) {
-                    navigateTo(_recentCount > 0
-                        ? Screen::SCREEN_READER
-                        : Screen::SCREEN_LIBRARY);
+                    if (_recentCount > 0) {
+                        String fullPath = String(SD_BOOKS_DIR) + "/"
+                                        + _recentBooks[_bookIndex].filename;
+                        if (BookReader::instance().openBook(fullPath.c_str())) {
+                            navigateTo(Screen::SCREEN_READER);
+                        }
+                    } else {
+                        navigateTo(Screen::SCREEN_LIBRARY);
+                    }
                 } else {
                     navigateTo(kMenuItems[_menuIndex].screen);
                 }
@@ -106,32 +113,64 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
             break;
 
         // ── Library ──────────────────────────────────────────────────────────
-        case Screen::SCREEN_LIBRARY:
-            if (btn == BTN_BACK || (btn == BTN_SELECT && longPress)) {
+        case Screen::SCREEN_LIBRARY: {
+            static constexpr int kLibRowH    = 28;
+            static constexpr int kLibListY   = CONTENT_Y + 44;
+            static constexpr int kLibVisRows = (EPD_HEIGHT - kLibListY - 20) / kLibRowH;
+
+            if (btn == BTN_BACK) {
                 back();
-            } else if (btn == BTN_UP || btn == BTN_DOWN) {
-                // Future: scroll book list; mark dirty so render can respond.
+            } else if (btn == BTN_UP && _libIndex > 0) {
+                --_libIndex;
+                if (_libIndex < _libScroll) --_libScroll;
                 _dirty = true;
+            } else if (btn == BTN_DOWN && _libIndex + 1 < (int)_libBooks.size()) {
+                ++_libIndex;
+                if (_libIndex >= _libScroll + kLibVisRows) ++_libScroll;
+                _dirty = true;
+            } else if (btn == BTN_SELECT && _libIndex < (int)_libBooks.size()) {
+                String bookPath = String(SD_BOOKS_DIR) + "/" + _libBooks[_libIndex];
+                if (BookReader::instance().openBook(bookPath.c_str())) {
+                    recordRecentBook(BookReader::instance().title(),
+                                     BookReader::instance().bareDir(),
+                                     BookReader::instance().chapterIdx(),
+                                     max(1, BookReader::instance().totalChapters() - 1));
+                    navigateTo(Screen::SCREEN_READER);
+                }
             }
             break;
+        }
 
         // ── Reader ───────────────────────────────────────────────────────────
-        case Screen::SCREEN_READER:
-            // Navigation is handled directly by the reader subsystem;
-            // UIManager just needs to route "back" gracefully.
-            if (btn == BTN_BACK && !longPress) {
+        case Screen::SCREEN_READER: {
+            const bool doBack = (btn == BTN_BACK && !longPress) ||
+                                (btn == BTN_SELECT && longPress);
+            if (doBack) {
+                if (BookReader::instance().isOpen()) {
+                    BookReader::instance().saveProgress();
+                    recordRecentBook(BookReader::instance().title(),
+                                     BookReader::instance().bareDir(),
+                                     BookReader::instance().chapterIdx(),
+                                     max(1, BookReader::instance().totalChapters() - 1));
+                }
                 back();
-            } else if (btn == BTN_SELECT && longPress) {
-                back();
+            } else {
+                if (BookReader::instance().handleButton(btn, longPress)) {
+                    _dirty = true;
+                }
             }
             break;
+        }
 
-        // ── Stats / Settings / Notes / Dict / Games ──────────────────────────
+        // ── Simple screens ────────────────────────────────────────────────────
         case Screen::SCREEN_STATS:
         case Screen::SCREEN_SETTINGS:
         case Screen::SCREEN_NOTES:
         case Screen::SCREEN_DICT:
-        // ── Terminal — route all buttons to TerminalApp ───────────────────
+            if (btn == BTN_BACK) back();
+            break;
+
+        // ── Terminal — route all buttons to TerminalApp ───────────────────────
         case Screen::SCREEN_TERMINAL:
             if (btn == BTN_BACK && !longPress) {
                 TerminalApp::instance().handleButton(btn, longPress);
@@ -159,8 +198,18 @@ void UIManager::handleButton(uint8_t btn, bool longPress) {
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::navigateTo(Screen s) {
     if (_history.size() < 16) _history.push_back(_current);
-    if (s == Screen::SCREEN_TERMINAL)        TerminalApp::instance().activate();
+    if (s == Screen::SCREEN_TERMINAL)             TerminalApp::instance().activate();
     else if (_current == Screen::SCREEN_TERMINAL) TerminalApp::instance().deactivate();
+
+    if (s == Screen::SCREEN_LIBRARY) {
+        _libIndex  = 0;
+        _libScroll = 0;
+        _libBooks.clear();
+        if (FileManager::instance().isReady()) {
+            FileManager::instance().listDir(SD_BOOKS_DIR, _libBooks, nullptr);
+        }
+    }
+
     _current = s;
     _dirty   = true;
 }
@@ -442,34 +491,54 @@ void UIManager::renderHome() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// renderLibrary
+// renderLibrary — scrollable, selectable book list
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::renderLibrary() {
     EPDDisplay& epd = EPDDisplay::instance();
 
     epd.drawText(MARGIN_X, CONTENT_Y + 16, "Library", 20, true, 0x0000);
-    epd.drawLine(MARGIN_X, CONTENT_Y + 20,
-                 EPD_WIDTH - MARGIN_X, CONTENT_Y + 20, 0x0000);
+    epd.drawLine(MARGIN_X, CONTENT_Y + 22, EPD_WIDTH - MARGIN_X, CONTENT_Y + 22, 0x0000);
 
-    std::vector<String> books;
-    bool ok = FileManager::instance().isReady() &&
-              FileManager::instance().listDir(SD_BOOKS_DIR, books, nullptr);
-
-    if (!ok || books.empty()) {
+    if (_libBooks.empty()) {
         epd.drawText(MARGIN_X, CONTENT_Y + 50,
                      "No books found.", 16, false, 0x0000);
-        epd.drawText(MARGIN_X, CONTENT_Y + 72,
-                     "Extract EPUBs to /books/<title>/", 12, false, 0x0000);
+        epd.drawText(MARGIN_X, CONTENT_Y + 74,
+                     "Extract EPUBs into /books/<title>/", 12, false, 0x0000);
     } else {
-        const int16_t lineH = epd.getLineHeight(16);
-        int16_t       iy    = CONTENT_Y + 28 + lineH;
-        for (const String& b : books) {
-            if (iy + lineH > EPD_HEIGHT - 10) {
-                epd.drawText(MARGIN_X, iy, "...", 12, false, 0x0000);
-                break;
+        static constexpr int16_t rowH   = 28;
+        static constexpr int16_t listY  = CONTENT_Y + 44;
+        const int visRows = (EPD_HEIGHT - (int)listY - 20) / (int)rowH;
+        const int lastIdx = min(_libScroll + visRows, (int)_libBooks.size());
+
+        int16_t y = listY;
+        for (int i = _libScroll; i < lastIdx; ++i) {
+            const bool sel = (i == _libIndex);
+            const int16_t textY = y + (rowH + 14) / 2;
+
+            if (sel) {
+                epd.fillRect(0, y, EPD_WIDTH, rowH, 0x0000);
+                epd.drawText(MARGIN_X, textY, _libBooks[i].c_str(), 16, false, 0xFFFF);
+                epd.drawText(EPD_WIDTH - epd.getTextWidth(">", 16, false) - MARGIN_X,
+                             textY, ">", 16, false, 0xFFFF);
+            } else {
+                epd.fillRect(0, y, EPD_WIDTH, rowH, 0xFFFF);
+                if (i < lastIdx - 1)
+                    epd.drawLine(0, y + rowH - 1, EPD_WIDTH - 1, y + rowH - 1, 0x0000);
+                epd.drawText(MARGIN_X, textY, _libBooks[i].c_str(), 16, false, 0x0000);
+                epd.drawText(EPD_WIDTH - epd.getTextWidth(">", 16, false) - MARGIN_X,
+                             textY, ">", 16, false, 0x0000);
             }
-            epd.drawText(MARGIN_X, iy, b.c_str(), 16, false, 0x0000);
-            iy += lineH + 2;
+            y += rowH;
+        }
+
+        // Scroll arrows
+        if (_libScroll > 0) {
+            int16_t aw = epd.getTextWidth("^", 10, false);
+            epd.drawText(EPD_WIDTH - aw - 4, listY, "^", 10, false, 0x0000);
+        }
+        if (_libScroll + visRows < (int)_libBooks.size()) {
+            int16_t aw = epd.getTextWidth("v", 10, false);
+            epd.drawText(EPD_WIDTH - aw - 4, EPD_HEIGHT - 24, "v", 10, false, 0x0000);
         }
     }
 
@@ -477,16 +546,10 @@ void UIManager::renderLibrary() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// renderReader
-// (Placeholder — actual page rendering is driven by TextRenderer.)
+// renderReader — delegates entirely to BookReader
 // ─────────────────────────────────────────────────────────────────────────────
 void UIManager::renderReader() {
-    EPDDisplay& epd = EPDDisplay::instance();
-
-    epd.drawText(MARGIN_X, CONTENT_Y + 16, "Reader", 16, true, 0x0000);
-    epd.drawText(MARGIN_X, CONTENT_Y + 40,
-                 "No book open. Go to Library.", 16, false, 0x0000);
-    epd.drawText(MARGIN_X, EPD_HEIGHT - 5, "BACK to return", 12, false, 0x0000);
+    BookReader::instance().render();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

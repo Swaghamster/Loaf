@@ -277,8 +277,6 @@ int TextRenderer::paginate(const String& text, std::vector<Page>& pages) {
 void TextRenderer::renderPage(const Page& page) {
     EPDDisplay& epd = EPDDisplay::instance();
 
-    epd.clear();
-
     for (const RenderLine& rl : page.lines) {
         if (rl.boldPart.length() > 0) {
             // Draw bold prefix
@@ -302,6 +300,4 @@ void TextRenderer::renderPage(const Page& page) {
             }
         }
     }
-
-    epd.update();
 }

@@ -13,6 +13,7 @@
 #include "display/EPDDisplay.h"
 #include "storage/FileManager.h"
 #include "ui/UIManager.h"
+#include "reader/BookReader.h"
 #include "terminal/TerminalApp.h"
 
 // Community SDK — real hardware drivers
@@ -65,7 +66,11 @@ void setup() {
     Serial.println(F("[boot] UIManager init"));
     UIManager::instance().init();
 
-    // 6. Terminal app (BLE keyboard host must be init'd first if using BLE).
+    // 6. Book reader (configures renderer defaults; doesn't open any book yet).
+    Serial.println(F("[boot] BookReader init"));
+    BookReader::instance().init();
+
+    // 7. Terminal app (BLE keyboard host must be init'd first if using BLE).
     Serial.println(F("[boot] TerminalApp init"));
     TerminalApp::instance().init();
 
@@ -122,6 +127,9 @@ void loop() {
 
     // ── Terminal SSH pump ─────────────────────────────────────────────────────
     TerminalApp::instance().tick();
+
+    // ── Render UI (no-op when not dirty) ─────────────────────────────────────
+    UIManager::instance().render();
 
     // ── Auto-sleep ────────────────────────────────────────────────────────────
     if (POWER_AUTO_SLEEP_MS > 0 &&
