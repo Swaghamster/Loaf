@@ -5,6 +5,7 @@
 #include "../reader/BookReader.h"
 #include "../terminal/TerminalApp.h"
 #include "../../include/config.h"
+#include <algorithm>
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Home screen — two-zone layout

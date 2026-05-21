@@ -6,6 +6,7 @@
 #include "../display/EPDDisplay.h"
 #include "../storage/FileManager.h"
 #include "../../include/config.h"
+#include <algorithm>
 
 // Button indices — match InputManager / UIManager constants.
 // Defined locally to avoid pulling in UIManager.h.

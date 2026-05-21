@@ -264,8 +264,9 @@ int TextRenderer::paginate(const String& text, std::vector<Page>& pages) {
 // ─────────────────────────────────────────────────────────────────────────────
 // renderPage
 //
-// Clears the framebuffer to white, draws all RenderLines in the page, then
-// flushes to the physical display.
+// Draws all RenderLines in the page into the EPD framebuffer.
+// The caller (UIManager::render) is responsible for epd.clear() before
+// and epd.update() after this call.
 //
 // For each RenderLine:
 //   - If boldPart is non-empty:

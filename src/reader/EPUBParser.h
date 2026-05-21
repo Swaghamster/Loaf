@@ -33,7 +33,7 @@ struct BookMeta {
     String title;
     String author;
     String coverPath;    ///< Absolute SD path to cover image, or empty
-    int    chapterCount; ///< Number of chapters in spine order
+    int    chapterCount = 0; ///< Number of chapters in spine order
 };
 
 /// A single chapter's content after HTML-tag stripping.
