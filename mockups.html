@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Loaf UI Mockups — Xteink X4 (800×480)</title>
+<style>
+  body { background: #777; font-family: sans-serif; padding: 20px; }
+  h2 { color: #fff; margin: 30px 0 6px; font-size:15px; }
+  .screen {
+    width: 800px; height: 480px;
+    background: #f4f0e6;
+    border: 3px solid #111;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    margin-bottom: 8px;
+    font-family: 'Liberation Sans', Arial, sans-serif;
+  }
+  .hline { position:absolute; left:0; right:0; height:1px; background:#222; }
+  .text  { position:absolute; color:#111; white-space:nowrap; }
+  .texti { position:absolute; color:#f4f0e6; white-space:nowrap; }
+  .f9  { font-size:11px; }
+  .f12 { font-size:14px; }
+  .f16 { font-size:18px; }
+  .f20 { font-size:22px; }
+  .f24 { font-size:27px; }
+  .bold{ font-weight:bold; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 1 — Home  (two-zone: book carousel top, app grid bottom)
+     BOOK_ZONE_TOP=22, BOOK_ZONE_BOT=270, APP_ZONE_TOP=278
+     cy(books)=22+(270-22)/2=146   cy(apps)=278+(480-278-24)/2=367
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>1 — Home Screen (book carousel + app grid)</h2>
+<div class="screen">
+
+  <!-- ── Status bar ───────────────────────────────────────────────────────── -->
+  <div style="position:absolute;top:0;left:0;right:0;height:20px;border-bottom:1px solid #111;">
+    <div style="position:absolute;left:4px;top:4px;width:18px;height:12px;border:1px solid #111;"></div>
+    <div style="position:absolute;left:6px;top:6px;width:11px;height:8px;background:#111;"></div>
+    <div style="position:absolute;left:23px;top:7px;width:2px;height:6px;background:#111;"></div>
+    <span class="text f9" style="left:32px;top:14px;">3 notes</span>
+    <span class="text f9" style="right:6px;top:14px;">0:04</span>
+  </div>
+
+  <!-- ── Book carousel ─────────────────────────────────────────────────────
+       cx=400, cy=146
+       ghost-L cx=90  adj-L cx=222  [CENTRE cx=400]  adj-R cx=578  ghost-R cx=710
+       sizes:  48×64          85×115         130×170          85×115         48×64
+  ────────────────────────────────────────────────────────────────────────── -->
+
+  <!-- ghost left — Dune (cx=90, cy=146, 48×64) -->
+  <div style="position:absolute;left:66px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(170deg,#111 0,#111 2px,#e8e4da 2px,#e8e4da 5px,#888 5px,#888 7px,#e8e4da 7px,#e8e4da 10px);"></div>
+  </div>
+
+  <!-- adjacent left — Neuromancer (cx=222, cy=146, 85×115) -->
+  <div style="position:absolute;left:180px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:18px;height:1px;background:#f4f0e6;opacity:.6;"></div>
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#f4f0e6;opacity:.8;"></div>
+    <div style="position:absolute;left:0;right:0;top:55px;height:1px;background:#f4f0e6;opacity:.4;"></div>
+    <div style="position:absolute;left:0;right:0;top:78px;height:1px;background:#f4f0e6;opacity:.3;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#f4f0e6;font-size:8px;font-weight:bold;line-height:11px;">NEURO<br>MANCER</span>
+  </div>
+
+  <!-- CENTRE selected — The Midnight Library (cx=400, cy=146, 130×170) -->
+  <!-- double selection ring: -5px and -3px outset -->
+  <div style="position:absolute;left:265px;top:56px;width:140px;height:180px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:267px;top:58px;width:136px;height:176px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <!-- stylised library shelves -->
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:75px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:115px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:155px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:8px;width:8px;height:25px;background:#111;"></div>
+    <div style="position:absolute;left:18px;top:12px;width:12px;height:21px;background:#555;"></div>
+    <div style="position:absolute;left:32px;top:6px;width:7px;height:27px;background:#111;"></div>
+    <div style="position:absolute;left:41px;top:10px;width:10px;height:23px;background:#888;"></div>
+    <div style="position:absolute;left:8px;top:43px;width:13px;height:25px;background:#555;"></div>
+    <div style="position:absolute;left:23px;top:39px;width:8px;height:29px;background:#111;"></div>
+    <div style="position:absolute;left:33px;top:45px;width:12px;height:22px;background:#888;"></div>
+    <span style="position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:9px;font-weight:bold;color:#111;line-height:12px;">The Midnight<br>Library</span>
+  </div>
+  <!-- progress bar (70% read) -->
+  <div style="position:absolute;left:265px;top:242px;width:140px;height:5px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:265px;top:242px;width:98px;height:5px;background:#111;"></div>
+  <span class="text f9" style="left:280px;top:256px;color:#555;">p.217 of 310</span>
+
+  <!-- adjacent right — Snow Crash (cx=578, cy=146, 85×115) -->
+  <div style="position:absolute;left:536px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,#111 0,#111 2px,#f4f0e6 2px,#f4f0e6 8px);opacity:.12;"></div>
+    <div style="position:absolute;left:8px;top:28px;right:8px;height:3px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:48px;right:24px;height:2px;background:#555;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#111;font-size:8px;font-weight:bold;line-height:11px;">SNOW<br>CRASH</span>
+  </div>
+
+  <!-- ghost right — 1984 (cx=710, cy=146, 48×64) -->
+  <div style="position:absolute;left:686px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <div style="position:absolute;left:4px;top:10px;right:4px;height:1px;background:#f4f0e6;opacity:.4;"></div>
+    <span style="position:absolute;bottom:4px;left:3px;color:#f4f0e6;font-size:7px;">1984</span>
+  </div>
+
+  <!-- ── Dot indicators (3 books shown, dotY=260, cx=400) ─────────────────── -->
+  <div style="position:absolute;top:257px;left:387px;width:6px;height:6px;background:#111;"></div>
+  <div style="position:absolute;top:258px;left:397px;width:4px;height:4px;border:1px solid #555;"></div>
+  <div style="position:absolute;top:258px;left:407px;width:4px;height:4px;border:1px solid #555;"></div>
+
+  <!-- ── iPod menu list (MENU_ZONE_TOP=276, ROW_H=29, 7 rows) ─────────────
+       Rows start at 277, each 29px: 277 306 335 364 393 422 451
+       Book zone active → no row highlighted.
+  ────────────────────────────────────────────────────────────────────────── -->
+  <div class="hline" style="top:276px;"></div>
+
+  <div style="position:absolute;top:277px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:291px;">Library</span>
+    <span class="text f12" style="right:16px;top:291px;">&gt;</span>
+    <div class="hline" style="top:305px;"></div>
+  </div>
+  <div style="position:absolute;top:306px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:320px;">Notes</span>
+    <span class="text f12" style="right:16px;top:320px;">&gt;</span>
+    <div class="hline" style="top:334px;"></div>
+  </div>
+  <div style="position:absolute;top:335px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:349px;">Stats</span>
+    <span class="text f12" style="right:16px;top:349px;">&gt;</span>
+    <div class="hline" style="top:363px;"></div>
+  </div>
+  <div style="position:absolute;top:364px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:378px;">Dictionary</span>
+    <span class="text f12" style="right:16px;top:378px;">&gt;</span>
+    <div class="hline" style="top:392px;"></div>
+  </div>
+  <div style="position:absolute;top:393px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:407px;">Settings</span>
+    <span class="text f12" style="right:16px;top:407px;">&gt;</span>
+    <div class="hline" style="top:421px;"></div>
+  </div>
+  <div style="position:absolute;top:422px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:436px;">Games</span>
+    <span class="text f12" style="right:16px;top:436px;">&gt;</span>
+    <div class="hline" style="top:450px;"></div>
+  </div>
+  <div style="position:absolute;top:451px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:465px;">Apps</span>
+    <span class="text f12" style="right:16px;top:465px;">&gt;</span>
+  </div>
+</div>
+
+<!-- ── Same screen, menu zone active (Library highlighted) ─────────────── -->
+<h2>1b — Home Screen (menu zone active, Library selected)</h2>
+<div class="screen">
+
+  <!-- Status bar -->
+  <div style="position:absolute;top:0;left:0;right:0;height:20px;border-bottom:1px solid #111;">
+    <div style="position:absolute;left:4px;top:4px;width:18px;height:12px;border:1px solid #111;"></div>
+    <div style="position:absolute;left:6px;top:6px;width:11px;height:8px;background:#111;"></div>
+    <div style="position:absolute;left:23px;top:7px;width:2px;height:6px;background:#111;"></div>
+    <span class="text f9" style="left:32px;top:14px;">3 notes</span>
+    <span class="text f9" style="right:6px;top:14px;">0:04</span>
+  </div>
+
+  <!-- Book carousel (same as above, no active selection ring since zone=1) -->
+  <div style="position:absolute;left:66px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(170deg,#111 0,#111 2px,#e8e4da 2px,#e8e4da 5px,#888 5px,#888 7px,#e8e4da 7px,#e8e4da 10px);"></div>
+  </div>
+  <div style="position:absolute;left:180px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#f4f0e6;opacity:.8;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#f4f0e6;font-size:8px;font-weight:bold;line-height:11px;">NEURO<br>MANCER</span>
+  </div>
+  <!-- Centre card — no double ring (zone inactive) -->
+  <div style="position:absolute;left:270px;top:61px;width:130px;height:170px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <div style="position:absolute;left:0;right:0;top:35px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:75px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:0;right:0;top:115px;height:2px;background:#111;"></div>
+    <div style="position:absolute;left:8px;top:8px;width:8px;height:25px;background:#111;"></div>
+    <div style="position:absolute;left:18px;top:12px;width:12px;height:21px;background:#555;"></div>
+    <span style="position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:9px;font-weight:bold;color:#111;line-height:12px;">The Midnight<br>Library</span>
+  </div>
+  <div style="position:absolute;left:536px;top:89px;width:85px;height:115px;border:1px solid #111;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#f4f0e6;"></div>
+    <div style="position:absolute;left:8px;top:28px;right:8px;height:3px;background:#111;"></div>
+    <span style="position:absolute;bottom:5px;left:4px;color:#111;font-size:8px;font-weight:bold;line-height:11px;">SNOW<br>CRASH</span>
+  </div>
+  <div style="position:absolute;left:686px;top:114px;width:48px;height:64px;border:1px solid #888;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:#111;"></div>
+    <span style="position:absolute;bottom:4px;left:3px;color:#f4f0e6;font-size:7px;">1984</span>
+  </div>
+
+  <!-- Divider -->
+  <div class="hline" style="top:276px;"></div>
+
+  <!-- Library — SELECTED -->
+  <div style="position:absolute;top:277px;left:0;right:0;height:29px;background:#111;">
+    <span class="texti f12" style="left:20px;top:291px;">Library</span>
+    <span class="texti f12" style="right:16px;top:291px;">&gt;</span>
+  </div>
+  <div style="position:absolute;top:306px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:320px;">Notes</span>
+    <span class="text f12" style="right:16px;top:320px;">&gt;</span>
+    <div class="hline" style="top:334px;"></div>
+  </div>
+  <div style="position:absolute;top:335px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:349px;">Stats</span>
+    <span class="text f12" style="right:16px;top:349px;">&gt;</span>
+    <div class="hline" style="top:363px;"></div>
+  </div>
+  <div style="position:absolute;top:364px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:378px;">Dictionary</span>
+    <span class="text f12" style="right:16px;top:378px;">&gt;</span>
+    <div class="hline" style="top:392px;"></div>
+  </div>
+  <div style="position:absolute;top:393px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:407px;">Settings</span>
+    <span class="text f12" style="right:16px;top:407px;">&gt;</span>
+    <div class="hline" style="top:421px;"></div>
+  </div>
+  <div style="position:absolute;top:422px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:436px;">Games</span>
+    <span class="text f12" style="right:16px;top:436px;">&gt;</span>
+    <div class="hline" style="top:450px;"></div>
+  </div>
+  <div style="position:absolute;top:451px;left:0;right:0;height:29px;background:#f4f0e6;">
+    <span class="text f12" style="left:20px;top:465px;">Apps</span>
+    <span class="text f12" style="right:16px;top:465px;">&gt;</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 2 — Notes list
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>2 — Notes List</h2>
+<div class="screen">
+  <div style="position:absolute;top:0;left:0;right:0;height:38px;background:#111;"></div>
+  <span class="texti bold f16" style="left:16px;top:27px;">Notes</span>
+  <span class="texti f12" style="right:16px;top:25px;">4 notes</span>
+
+  <!-- selected row -->
+  <div style="position:absolute;top:38px;left:0;right:0;height:54px;background:#111;"></div>
+  <span class="texti bold f16" style="left:16px;top:62px;">The Midnight Library</span>
+  <span class="texti f12" style="left:16px;top:79px;">Between life and death there is a library...</span>
+  <span class="texti f12" style="right:16px;top:62px;">14KB</span>
+  <div class="hline" style="top:92px;background:#555;"></div>
+
+  <span class="text bold f16" style="left:16px;top:115px;">Shopping list</span>
+  <span class="text f12" style="left:16px;top:132px;">milk eggs bread coffee oat...</span>
+  <span class="text f12" style="right:16px;top:115px;">512B</span>
+  <div class="hline" style="top:149px;"></div>
+
+  <span class="text bold f16" style="left:16px;top:171px;">Book ideas</span>
+  <span class="text f12" style="left:16px;top:188px;">1. Neuromancer  2. Snow Crash  3. Blindsight...</span>
+  <span class="text f12" style="right:16px;top:171px;">1KB</span>
+  <div class="hline" style="top:205px;"></div>
+
+  <span class="text bold f16" style="left:16px;top:228px;">Meeting notes 2026-05-12</span>
+  <span class="text f12" style="left:16px;top:245px;">Q2 roadmap discussion. Action items: ...</span>
+  <span class="text f12" style="right:16px;top:228px;">3KB</span>
+  <div class="hline" style="top:262px;"></div>
+
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:467px;">UP/DN: scroll   SEL: open   MENU: new   SEL long: delete</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 3 — Reader (bionic mode)
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>3 — Reader (Bionic Reading)</h2>
+<div class="screen">
+  <div style="position:absolute;top:0;left:0;right:0;height:22px;background:#111;"></div>
+  <span class="texti f12" style="left:16px;top:16px;">The Midnight Library</span>
+  <span class="texti f12" style="right:16px;top:16px;">p. 42 / 310</span>
+
+  <div style="position:absolute;left:32px;top:36px;right:32px;bottom:44px;font-size:18px;line-height:28px;color:#111;">
+    <b>No</b>ra <b>See</b>d <b>ha</b>d <b>dec</b>ided <b>sh</b>e <b>di</b>d <b>no</b>t <b>wa</b>nt <b>t</b>o <b>exi</b>st <b>any</b>more.<br>
+    <b>Sh</b>e <b>ha</b>d <b>dec</b>ided <b>thi</b>s <b>o</b>n <b>a</b> <b>Tue</b>sday — <b>mid</b>night <b>bet</b>ween<br>
+    <b>Mon</b>day <b>an</b>d <b>Wed</b>nesday — <b>bec</b>ause <b>Tue</b>sdays <b>alw</b>ays<br>
+    <b>fel</b>t <b>lik</b>e <b>th</b>e <b>mo</b>st <b>mea</b>ningless <b>da</b>y. <b>Sh</b>e <b>wro</b>te <b>a</b><br>
+    <b>sui</b>cide <b>no</b>te <b>an</b>d <b>too</b>k <b>a</b> <b>let</b>hal <b>do</b>se <b>o</b>f <b>slee</b>ping<br>
+    <b>pil</b>ls <b>an</b>d <b>wai</b>ted <b>fo</b>r <b>eve</b>rything <b>t</b>o <b>en</b>d.<br><br>
+    <b>I</b>t <b>did</b>n't.<br><br>
+    <b>Ins</b>tead <b>sh</b>e <b>fou</b>nd <b>her</b>self <b>i</b>n <b>a</b> <b>lib</b>rary.
+  </div>
+
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:467px;">L/R: page   SEL long: dictionary   BACK: menu</span>
+  <span class="text f9" style="right:16px;top:467px;">Bionic: ON</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 4 — Note Editor (soft keyboard)
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>4 — Note Editor</h2>
+<div class="screen">
+  <div style="position:absolute;top:0;left:0;right:0;height:20px;background:#111;"></div>
+  <span class="texti f9" style="left:8px;top:14px;">shopping-list.txt</span>
+  <span class="texti f9" style="right:8px;top:14px;">● unsaved</span>
+
+  <div style="position:absolute;left:8px;top:28px;font-size:18px;line-height:26px;color:#111;">
+    milk<br>eggs<br>bread<br>coffee<br>oat milk<span style="background:#111;color:#f4f0e6;"> </span>
+  </div>
+
+  <div class="hline" style="top:355px;"></div>
+
+  <style>
+    .key{position:absolute;width:33px;height:25px;border:1px solid #666;background:#f4f0e6;
+         text-align:center;line-height:25px;font-size:12px;color:#111;border-radius:2px;}
+    .key.on{background:#111;color:#f4f0e6;}
+    .key.w2{width:58px;}
+    .key.w3{width:110px;}
+  </style>
+  <!-- row 0 numbers -->
+  <div class="key" style="left:4px;top:358px;">1</div><div class="key" style="left:39px;top:358px;">2</div>
+  <div class="key" style="left:74px;top:358px;">3</div><div class="key" style="left:109px;top:358px;">4</div>
+  <div class="key" style="left:144px;top:358px;">5</div><div class="key" style="left:179px;top:358px;">6</div>
+  <div class="key" style="left:214px;top:358px;">7</div><div class="key" style="left:249px;top:358px;">8</div>
+  <div class="key" style="left:284px;top:358px;">9</div><div class="key" style="left:319px;top:358px;">0</div>
+  <div class="key" style="left:354px;top:358px;">-</div><div class="key" style="left:389px;top:358px;">=</div>
+  <!-- row 1 QWERTY -->
+  <div class="key" style="left:4px;top:385px;">Q</div><div class="key" style="left:39px;top:385px;">W</div>
+  <div class="key" style="left:74px;top:385px;">E</div><div class="key" style="left:109px;top:385px;">R</div>
+  <div class="key" style="left:144px;top:385px;">T</div><div class="key" style="left:179px;top:385px;">Y</div>
+  <div class="key" style="left:214px;top:385px;">U</div><div class="key" style="left:249px;top:385px;">I</div>
+  <div class="key" style="left:284px;top:385px;">O</div><div class="key" style="left:319px;top:385px;">P</div>
+  <!-- row 2 ASDF (O selected) -->
+  <div class="key" style="left:4px;top:412px;">A</div><div class="key" style="left:39px;top:412px;">S</div>
+  <div class="key" style="left:74px;top:412px;">D</div><div class="key" style="left:109px;top:412px;">F</div>
+  <div class="key" style="left:144px;top:412px;">G</div><div class="key" style="left:179px;top:412px;">H</div>
+  <div class="key" style="left:214px;top:412px;">J</div><div class="key" style="left:249px;top:412px;">K</div>
+  <div class="key on" style="left:284px;top:412px;">L</div>
+  <!-- row 3 ZXCVBNM + specials -->
+  <div class="key" style="left:4px;top:439px;">Z</div><div class="key" style="left:39px;top:439px;">X</div>
+  <div class="key" style="left:74px;top:439px;">C</div><div class="key" style="left:109px;top:439px;">V</div>
+  <div class="key" style="left:144px;top:439px;">B</div><div class="key" style="left:179px;top:439px;">N</div>
+  <div class="key" style="left:214px;top:439px;">M</div>
+  <div class="key w2" style="left:249px;top:439px;">BKSP</div>
+  <div class="key w3" style="left:309px;top:439px;">SPACE</div>
+
+  <span class="text f9" style="left:440px;top:363px;">UP/DN: row   SEL: type   BACK: menu</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SCREEN 5 — Reading Stats
+     ══════════════════════════════════════════════════════════════════════ -->
+<h2>5 — Reading Stats</h2>
+<div class="screen">
+  <div style="position:absolute;top:0;left:0;right:0;height:30px;background:#111;"></div>
+  <span class="texti bold f16" style="left:8px;top:22px;">Reading Stats</span>
+
+  <span class="text bold f16" style="left:16px;top:55px;">Today</span>
+  <span class="text f16" style="left:16px;top:76px;">1h 24m — 62 pages</span>
+  <div class="hline" style="top:100px;"></div>
+
+  <span class="text bold f16" style="left:16px;top:116px;">Streak</span>
+  <span class="text f16" style="left:16px;top:137px;">7 days</span>
+  <div class="hline" style="top:160px;"></div>
+
+  <span class="text bold f16" style="left:16px;top:176px;">Daily Goal (30 min)</span>
+  <div style="position:absolute;left:16px;top:202px;width:600px;height:18px;border:1px solid #111;"></div>
+  <div style="position:absolute;left:16px;top:202px;width:420px;height:18px;background:#111;"></div>
+  <span class="text f12" style="left:624px;top:216px;">70%</span>
+  <div class="hline" style="top:234px;"></div>
+
+  <span class="text bold f16" style="left:16px;top:250px;">Last 30 days</span>
+
+  <style>
+    .hc{position:absolute;width:18px;height:18px;border:1px solid #bbb;}
+    .d0{background:#f4f0e6;}.d1{background:#ccc;}.d2{background:#888;}.d3{background:#444;}.d4{background:#111;}
+  </style>
+  <!-- 3 rows × 10 cols of heatmap cells -->
+  <div class="hc d2" style="left:16px;top:273px;"></div><div class="hc d3" style="left:36px;top:273px;"></div>
+  <div class="hc d4" style="left:56px;top:273px;"></div><div class="hc d1" style="left:76px;top:273px;"></div>
+  <div class="hc d3" style="left:96px;top:273px;"></div><div class="hc d4" style="left:116px;top:273px;"></div>
+  <div class="hc d0" style="left:136px;top:273px;"></div><div class="hc d2" style="left:156px;top:273px;"></div>
+  <div class="hc d3" style="left:176px;top:273px;"></div><div class="hc d4" style="left:196px;top:273px;"></div>
+
+  <div class="hc d1" style="left:16px;top:293px;"></div><div class="hc d0" style="left:36px;top:293px;"></div>
+  <div class="hc d2" style="left:56px;top:293px;"></div><div class="hc d4" style="left:76px;top:293px;"></div>
+  <div class="hc d4" style="left:96px;top:293px;"></div><div class="hc d3" style="left:116px;top:293px;"></div>
+  <div class="hc d2" style="left:136px;top:293px;"></div><div class="hc d1" style="left:156px;top:293px;"></div>
+  <div class="hc d3" style="left:176px;top:293px;"></div><div class="hc d4" style="left:196px;top:293px;"></div>
+
+  <div class="hc d2" style="left:16px;top:313px;"></div><div class="hc d3" style="left:36px;top:313px;"></div>
+  <div class="hc d1" style="left:56px;top:313px;"></div><div class="hc d0" style="left:76px;top:313px;"></div>
+  <div class="hc d4" style="left:96px;top:313px;"></div><div class="hc d3" style="left:116px;top:313px;"></div>
+  <div class="hc d2" style="left:136px;top:313px;"></div><div class="hc d4" style="left:156px;top:313px;"></div>
+  <div class="hc d4" style="left:176px;top:313px;"></div><div class="hc d3" style="left:196px;top:313px;"></div>
+
+  <span class="text f9" style="left:16px;top:348px;">less</span>
+  <div class="hc d0" style="left:46px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d1" style="left:61px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d2" style="left:76px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d3" style="left:91px;top:345px;width:13px;height:13px;"></div>
+  <div class="hc d4" style="left:106px;top:345px;width:13px;height:13px;"></div>
+  <span class="text f9" style="left:122px;top:348px;">more</span>
+
+  <div class="hline" style="top:455px;"></div>
+  <span class="text f9" style="left:16px;top:467px;">BACK: return home</span>
+</div>
+
+</body>
+</html>
